@@ -8,7 +8,7 @@ import json
 import websockets
 
 class Robot:
-    def __init__(self, robotId, ExecutionId, url, ip , port, username, password):
+    def __init__(self, robotId, ExecutionId, url, ip, port, username, password):
         self.robotId = robotId
         self.ExecutionId = ExecutionId
         self.url = url
@@ -30,7 +30,7 @@ class Robot:
 
     def findQueuesByName(self, queueName):
         Queues=[]
-        queues = requests.get(f'http://localhost:8000/api/queues/QueueName={queueName}/',
+        queues = requests.get(f'{self.url}/api/queues/QueueName={queueName}/',
                               headers={'Authorization': f'Token {self.token}'}).json()
 
         for queue in queues:
@@ -73,13 +73,9 @@ class Queue:
         if queueId is None:
             self.queueId = id_generator(16)
             self.queueName = queueName
-            try:
-                requests.post(f'{self.url}/api/queues/',
+            requests.post(f'{self.url}/api/queues/',
                           {'RobotId': self.robotId, 'QueueId': self.queueId, 'QueueName': self.queueName},
                           headers={'Authorization': f'Token {self.token}'})
-            except:
-                raise(error.HTTP)
-
         else:
             self.queueId = queueId
             response = requests.get(f'{self.url}/api/queues/QueueId={self.queueId}/',
