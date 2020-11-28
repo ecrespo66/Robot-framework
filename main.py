@@ -1,7 +1,7 @@
 import sys
 import json
-from robot import main
+import robot
 
 
 if __name__ == "__main__":
-    main.run(sys.argv[1])
+    robot.Main(sys.argv[1]).runRobot()
