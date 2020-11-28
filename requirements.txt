@@ -6,6 +6,7 @@ chardet==3.0.4
 DateTime==4.3
 docx2pdf==0.1.7
 et-xmlfile==1.0.1
+iBotAutomation==1.1
 idna==2.10
 imap-tools==0.16.1
 importlib-metadata==1.7.0
@@ -148,5 +149,6 @@ selenium==3.141.0
 soupsieve==2.0.1
 tqdm==4.53.0
 urllib3==1.25.9
+websockets==8.1
 zipp==3.4.0
 zope.interface==5.2.0
