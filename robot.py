@@ -4,10 +4,13 @@ import json
 
 class Main(Robot):
     def __init__(self, args):
-        self.params = args
-        super().__init__(self.params['RobotId'], self.params['url'], self.params['ip'], self.params['port'],
-                         self.params['params'], self.params['username'], self.params['password'])
 
+        self.params = args
+        super().__init__(robotId=self.params['RobotId'], ExecutionId= self.params['ExecutionId'],url= self.params['url'],
+                         ip=self.params['ip'], port=self.params['port'], username= self.params['username'],
+                         password=self.params['password'],params =self.params['params'])
     def runRobot(self):
         self.queue = self.createQueue("pollon")
+
+
 

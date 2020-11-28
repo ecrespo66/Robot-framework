@@ -7,8 +7,10 @@ import asyncio
 import json
 import websockets
 
+
+
 class Robot:
-    def __init__(self, robotId, ExecutionId, url, ip, port, username, password):
+    def __init__(self, robotId, ExecutionId, url, ip, port, username, password, params):
         self.robotId = robotId
         self.ExecutionId = ExecutionId
         self.url = url
@@ -16,7 +18,8 @@ class Robot:
         self.port = port
         self.username = username
         self.password = password
-        response = requests.post(f"{self.url}/api-token-auth/",{'username': self.username, 'password': self.password})
+        self.params = params
+        response = requests.post(f"{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
         self.token = response.json()['token']
         self.Log = self.Log(self)
 
