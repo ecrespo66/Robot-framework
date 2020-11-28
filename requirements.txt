@@ -6,7 +6,6 @@ chardet==3.0.4
 DateTime==4.3
 docx2pdf==0.1.7
 et-xmlfile==1.0.1
-iBotAutomation==1.1
 idna==2.10
 imap-tools==0.16.1
 importlib-metadata==1.7.0
