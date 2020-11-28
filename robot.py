@@ -11,6 +11,10 @@ class Main(Robot):
                          password=self.params['password'],params =self.params['params'])
     def runRobot(self):
         self.queue = self.createQueue("pollon")
+        self.Log.info("Info")
+        self.Log.systemException("System Exception")
+        self.Log.businessException("Business Exception")
+        self.Log.log("Log")
 
 
 
