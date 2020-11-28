@@ -4,4 +4,6 @@ import robot
 
 
 if __name__ == "__main__":
-   robot.Main(sys.argv[1][0]).runRobot()
+
+   print(json.loads(json.dumps(sys.argv[1][0])))
+   #robot.Main(sys.argv[1][0]).runRobot()
