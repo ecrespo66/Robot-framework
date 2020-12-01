@@ -1,5 +1,4 @@
 import time
-
 from iBot import Robot
 import json
 

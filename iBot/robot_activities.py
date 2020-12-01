@@ -6,7 +6,7 @@ import requests
 import asyncio
 import json
 import websockets
-from django.db.models import Q
+
 
 
 class Robot:
