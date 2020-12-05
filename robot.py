@@ -20,4 +20,8 @@ class Main(Robot):
 
 class systemException(Main):
     def __init__(self, exception):
-        await self.systemException(exception)
+        self.exception = exception
+        await self.systemException()
+
+    async def sendExecution(self):
+        await self.systemException(self.exception)
