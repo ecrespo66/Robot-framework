@@ -13,8 +13,11 @@ class Main(Robot):
     def runRobot(self):
         self.queue = self.createQueue("pollon")
 
-        for i in range(0,60):
+        for i in range(0, 60):
             time.sleep(1)
             self.Log.info("Item" + str(i))
 
 
+class systemException(Main):
+    def __init__(self, exception):
+        await self.systemException(exception)
