@@ -15,7 +15,7 @@ class Main(Robot):
 
         for i in range(0, 60):
             time.sleep(1)
-            self.Log.info("Item" + str(i))
+            self.Log.info("Item" + i)
 
 
 
