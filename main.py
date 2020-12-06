@@ -11,6 +11,6 @@ if __name__ == "__main__":
         Robot.runRobot()
     except Exception as e:
 
-        Robot.Log.systemException(str(e))
-        Robot.Log.systemException(str(traceback.print_exception()))
+        Robot.Log.systemException(str(e.format_exc))
+        Robot.Log.systemException(str(traceback.format_exc()))
 
