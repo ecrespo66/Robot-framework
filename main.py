@@ -9,7 +9,7 @@ if __name__ == "__main__":
     try:
         Robot = robot.Main(args)
         Robot.runRobot()
-    except Exception as e:
-        Robot.Log.systemException(str(e))
-        Robot.Log.systemException(str(traceback.format_exc()))
+    except:
+        for line in traceback.format_exc().splitlines():
+            Robot.Log.systemException(str(line))
 
