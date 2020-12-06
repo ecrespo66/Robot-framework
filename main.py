@@ -10,7 +10,7 @@ if __name__ == "__main__":
         Robot = robot.Main(args)
         Robot.runRobot()
     except Exception as e:
-        await Robot.sendExecution(str(e), "businessException")
+
         Robot.Log.systemException(str(e))
         Robot.Log.systemException(str(traceback.print_exception()))
 
