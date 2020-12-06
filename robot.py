@@ -18,10 +18,4 @@ class Main(Robot):
             self.Log.info("Item" + str(i))
 
 
-class systemException(Main):
-    def __init__(self, exception):
-        self.exception = exception
-        await self.raiseError()
 
-    async def raiseError(self):
-        await self.sendExecution(self.exception, "systemException")
