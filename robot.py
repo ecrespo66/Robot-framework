@@ -1,21 +1,24 @@
 import time
 from iBot import Robot
-import json
 
 
 class Main(Robot):
     def __init__(self, args):
-        self.params = args
-        super().__init__(robotId=self.params['RobotId'], ExecutionId=self.params['ExecutionId'], url=self.params['url'],
-                         ip=self.params['ip'], port=self.params['port'], username=self.params['username'],
-                         password=self.params['password'], params=self.params['params'])
+        self.robotId = args['RobotId']
+        self.ExecutionId = args['ExecutionId']
+        self.url = args['url']
+        self.ip = args['ip']
+        self.port = args['port']
+        self.username = args['username']
+        self.password = args['password']
+        self.robotParameters = args['params']
+
+        super().__init__(robotId=self.robotId, ExecutionId=self.ExecutionId, url=self.url,
+                         ip=self.ip, port=self.port, username=self.username, password=self.password,
+                         params=self.robotParameters)
 
     def runRobot(self):
         self.queue = self.createQueue("pollon")
-
         for i in range(0, 60):
             time.sleep(1)
-            self.Log.info("Item" + i)
-
-
-
+            self.Log.info("Item" + str(i))
