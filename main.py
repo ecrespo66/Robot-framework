@@ -12,3 +12,4 @@ if __name__ == "__main__":
     except:
         for line in traceback.format_exc().splitlines():
             Robot.Log.systemException(str(line))
+        Robot.Log.systemException("[Execution Failed]")

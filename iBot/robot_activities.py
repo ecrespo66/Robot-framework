@@ -127,13 +127,15 @@ class Item(Queue):
         self.endDate = None
         if itemId is None:
             self.itemId = id_generator(24)
-            self.value = value
-            self.status = 'Pending'
-            itemData = {'QueueId': self.QueueId, 'ItemId': self.itemId, 'Value': str(value),
-                        'Status': self.status, 'CreationTime': datetime.now()}
-
-            requests.post(f'{self.url}/api/items/', itemData,
-                          headers={'Authorization': f'Token {self.token}'})
+            if type(value) is dict:
+                self.value = str(value)
+                self.status = 'Pending'
+                itemData = {'QueueId': self.QueueId, 'ItemId': self.itemId, 'Value': str(value),
+                            'Status': self.status, 'CreationTime': datetime.now()}
+                requests.post(f'{self.url}/api/items/', itemData,
+                              headers={'Authorization': f'Token {self.token}'})
+            else:
+                raise ValueError("Item data must be a dictionary")
         else:
             self.itemId = itemId
             item = requests.get(f'{self.url}/api/items/ItemId={self.itemId}',
