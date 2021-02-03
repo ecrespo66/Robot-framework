@@ -18,7 +18,15 @@ class Robot:
         self.username = username
         self.password = password
         self.params = params
-        response = requests.post(f"{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
+
+        if "https://" in self.url:
+            self.httpprotocol = "https://"
+            self.wsprotocol = "wss://"
+        else:
+            self.httpprotocol = "http://"
+            self.wsprotocol = "ws://"
+
+        response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
         self.token = response.json()['token']
         self.Log = self.Log(self)
         self.queue = None
@@ -33,7 +41,7 @@ class Robot:
 
     def findQueuesByName(self, queueName):
         Queues = []
-        queues = requests.get(f'{self.url}/api/queues/QueueName={queueName}/',
+        queues = requests.get(f'{self.httpprotocol}{self.url}/api/queues/QueueName={queueName}/',
                               headers={'Authorization': f'Token {self.token}'}).json()
 
         for queue in queues:
@@ -42,7 +50,7 @@ class Robot:
 
     async def sendExecution(self, message, type='log'):
         await asyncio.sleep(0.01)
-        uri = f"ws://{self.ip}:{self.port}/ws/execution/{self.ExecutionId}/"
+        uri = f"{self.wsprotocol}{self.url}/ws/execution/{self.ExecutionId}/"
         message = json.dumps({"message": {"type": type, "data": message, "executionId": self.ExecutionId}})
         async with websockets.connect(uri) as websocket:
             await websocket.send(str(message))
@@ -76,17 +84,17 @@ class Queue:
         if queueId is None:
             self.queueId = id_generator(16)
             self.queueName = queueName
-            requests.post(f'{self.url}/api/queues/',
+            requests.post(f'{self.httpprotocol}{self.url}/api/queues/',
                           {'RobotId': self.robotId, 'QueueId': self.queueId, 'QueueName': self.queueName},
                           headers={'Authorization': f'Token {self.token}'})
         else:
             self.queueId = queueId
-            response = requests.get(f'{self.url}/api/queues/QueueId={self.queueId}/',
+            response = requests.get(f'{self.httpprotocol}{self.url}/api/queues/QueueId={self.queueId}/',
                                     headers={'Authorization': f'Token {self.token}'})
             self.queueName = response.json()['QueueName']
 
     def __getItem(self):
-        queueItems = requests.get(f'{self.url}/api/items/QueueId={self.queueId}',
+        queueItems = requests.get(f'{self.httpprotocol}{self.url}/api/items/QueueId={self.queueId}',
                                   headers={'Authorization': f'Token {self.token}'}).json()
 
         for Qitem in queueItems:
@@ -132,13 +140,13 @@ class Item(Queue):
                 self.status = 'Pending'
                 itemData = {'QueueId': self.QueueId, 'ItemId': self.itemId, 'Value': str(value),
                             'Status': self.status, 'CreationTime': datetime.now()}
-                requests.post(f'{self.url}/api/items/', itemData,
+                requests.post(f'{self.httpprotocol}{self.url}/api/items/', itemData,
                               headers={'Authorization': f'Token {self.token}'})
             else:
                 raise ValueError("Item data must be a dictionary")
         else:
             self.itemId = itemId
-            item = requests.get(f'{self.url}/api/items/ItemId={self.itemId}',
+            item = requests.get(f'{self.httpprotocol}{self.url}/api/items/ItemId={self.itemId}',
                                 headers={'Authorization': f'Token {self.token}'}).json()
 
             self.value = item['Value']
@@ -147,31 +155,31 @@ class Item(Queue):
     def setItemAsWorking(self):
         self.status = 'Working'
         data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        requests.put(f'{self.url}/api/items/{self.itemId}/', data,
+        requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
                      headers={'Authorization': f'Token {self.token}'})
 
     def setItemAsOk(self):
         self.status = 'OK'
         data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        requests.put(f'{self.url}/api/items/{self.itemId}/', data,
+        requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
                      headers={'Authorization': f'Token {self.token}'})
 
     def setItemAsFail(self):
         self.status = 'Fail'
         data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        requests.put(f'{self.url}/api/items/{self.itemId}/', data,
+        requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
                      headers={'Authorization': f'Token {self.token}'})
 
     def setItemAsWarn(self):
         self.status = 'Warn'
         data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        requests.put(f'{self.url}/api/items/{self.itemId}/', data,
+        requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
                      headers={'Authorization': f'Token {self.token}'})
 
     def setItemAsPending(self):
         self.status = 'Pending'
         data = {"ItemId": self.itemId, "Status": self.status}
-        requests.put(f'{self.url}/api/items/{self.itemId}/', data,
+        requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
                      headers={'Authorization': f'Token {self.token}'})
 
     def setItemExecution(self):
