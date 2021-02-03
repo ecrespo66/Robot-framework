@@ -81,6 +81,13 @@ class Queue:
         self.url = url
         self.robotId = robotId
         self.__retryTimes = 1
+
+        if "https://" in self.url:
+            self.httpprotocol = "https://"
+            self.wsprotocol = "wss://"
+        else:
+            self.httpprotocol = "http://"
+            self.wsprotocol = "ws://"
         if queueId is None:
             self.queueId = id_generator(16)
             self.queueName = queueName
