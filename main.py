@@ -1,12 +1,12 @@
 import sys
 import json
 import traceback
-from .robot import Main
+from .robot import robot
 
 if __name__ == "__main__":
     args = json.loads(str(sys.argv[1]))
     try:
-        Robot = Main(args)
+        Robot = robot.Main(args)
         Robot.runRobot()
     except:
         for line in traceback.format_exc().splitlines():
