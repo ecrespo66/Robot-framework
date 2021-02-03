@@ -2,7 +2,7 @@ import sys
 import json
 import traceback
 
-import robot
+from . import robot
 
 if __name__ == "__main__":
     args = json.loads(str(sys.argv[1]))
