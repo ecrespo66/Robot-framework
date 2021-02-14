@@ -9,12 +9,10 @@ import websockets
 
 
 class Robot:
-    def __init__(self, robotId, ExecutionId, url, ip, port, username, password, params):
+    def __init__(self, robotId, ExecutionId, url, username, password, params):
         self.robotId = robotId
         self.ExecutionId = ExecutionId
         self.url = url
-        self.ip = ip
-        self.port = port
         self.username = username
         self.password = password
         self.params = params
