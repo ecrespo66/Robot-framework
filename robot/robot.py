@@ -7,14 +7,12 @@ class Main(Robot):
         self.robotId = args['RobotId']
         self.ExecutionId = args['ExecutionId']
         self.url = args['url']
-        self.ip = args['ip']
-        self.port = args['port']
         self.username = args['username']
         self.password = args['password']
         self.robotParameters = args['params']
 
         super().__init__(robotId=self.robotId, ExecutionId=self.ExecutionId, url=self.url,
-                         ip=self.ip, port=self.port, username=self.username, password=self.password,
+                         username=self.username, password=self.password,
                          params=self.robotParameters)
 
     def runRobot(self):
