@@ -14,9 +14,42 @@ class Main(Robot):
         super().__init__(robotId=self.robotId, ExecutionId=self.ExecutionId, url=self.url,
                          username=self.username, password=self.password,
                          params=self.robotParameters)
+    def cleanup(self):
+        pass
 
-    def runRobot(self):
+    def init(self):
+        pass
+
+    def run(self):
         self.queue = self.createQueue("pollon")
         for i in range(0, 60):
             time.sleep(1)
             self.Log.info("Item" + str(i))
+
+    def end(self):
+        self.finishExecution()
+
+
+class BusinessException(Main, Exception):
+    def init(self, message, action):
+        self.action = action
+        self.message = message
+        self.processException()
+
+    def processException(self):
+        self.Log.businessException(self.message)
+        pass
+
+
+class SystemException(Main, Exception):
+    def init(self, message, action):
+        self.action = action
+        self.message = message
+        self.processException()
+
+    def processException(self):
+        self.Log.systemException(self.message)
+        pass
+
+
+

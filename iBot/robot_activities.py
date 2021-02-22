@@ -26,7 +26,7 @@ class Robot:
 
         response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
         self.token = response.json()['token']
-        self.Log = self.Log(self)
+        self.log = self.Log(self)
         self.queue = None
 
     def createQueue(self, queueName):
@@ -46,12 +46,20 @@ class Robot:
             Queues.append(Queue(self.robotId, self.url, self.token, queueId=queue['QueueId']))
         return Queues
 
+    def finishExecution(self):
+        asyncio.run(self.sendExecution("[Execution Over]"))
+
     async def sendExecution(self, message, type='log'):
         await asyncio.sleep(0.01)
         uri = f"{self.wsprotocol}{self.url}/ws/execution/{self.ExecutionId}/"
         message = json.dumps({"message": {"type": type, "data": message, "executionId": self.ExecutionId}})
         async with websockets.connect(uri) as websocket:
             await websocket.send(str(message))
+            try:
+                recived = await asyncio.wait_for(websocket.recv(), timeout=10)
+            except asyncio.TimeoutError:
+                await self.sendExecution(message, type)
+            await websocket.close()
 
     class Log:
         def __init__(self, robot):
