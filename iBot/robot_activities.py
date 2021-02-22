@@ -26,7 +26,7 @@ class Robot:
 
         response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
         self.token = response.json()['token']
-        self.log = self.Log(self)
+        self.Log = self.Log(self)
         self.queue = None
 
     def createQueue(self, queueName):
@@ -56,7 +56,7 @@ class Robot:
         async with websockets.connect(uri) as websocket:
             await websocket.send(str(message))
             try:
-                recived = await asyncio.wait_for(websocket.recv(), timeout=10)
+                await asyncio.wait_for(websocket.recv(), timeout=10)
             except asyncio.TimeoutError:
                 await self.sendExecution(message, type)
             await websocket.close()
