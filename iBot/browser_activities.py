@@ -2,7 +2,6 @@ from .undetected_chromedriver import install
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
 import chromedriver_autoinstaller
-chromedriver_autoinstaller.install()
 import robot.settings as settings
 import time
 from selenium.webdriver.common.keys import Keys
