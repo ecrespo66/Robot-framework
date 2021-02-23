@@ -16,6 +16,7 @@ class Robot:
         self.username = username
         self.password = password
         self.params = params
+        self.Log = self.Log(self)
 
         if "https://" in self.url:
             self.httpprotocol = "https://"
@@ -26,7 +27,6 @@ class Robot:
 
         response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
         self.token = response.json()['token']
-        self.Log = self.Log(self)
         self.queue = None
 
     def createQueue(self, queueName):
@@ -68,16 +68,24 @@ class Robot:
         async def send(self, log, type):
             await self.robot.sendExecution(log, type=type)
 
+        def debug(self, log):
+            '''Send debug trace to ochestrator'''
+            asyncio.run(self.send(log, type='debug'))
+
         def log(self, log):
+            '''Send log trace to ochestrator'''
             asyncio.run(self.send(log, type='log'))
 
         def info(self, log):
+            '''send info trace to orchestrator'''
             asyncio.run(self.send(log, type='info'))
 
         def systemException(self, error):
+            '''send systemException trace to orchestrator'''
             asyncio.run(self.send(error, type="systemException"))
 
         def businessException(self, error):
+            '''send businessException trace to orchestrator'''
             asyncio.run(self.send(error, type="businesException"))
 
 

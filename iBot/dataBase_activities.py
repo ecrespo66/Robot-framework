@@ -2,6 +2,7 @@ import sqlite3
 
 
 class Sqlite:
+    '''Create a Sqlite database, send the path where the database is going to be stored'''
     def __init__(self, database):
         self.DataBase = database
         self.sqliteConnection = None
@@ -17,6 +18,7 @@ class Sqlite:
         self.sqliteConnection.close()
 
     def tableList(self):
+        ''':return: List of all the tables in the Database '''
         tables = []
         try:
             self.__createConnection()
@@ -30,6 +32,7 @@ class Sqlite:
         return tables
 
     def createTable(self, tableName, data):
+        '''Create Table with data sent in a '''
         tables = self.tableList()
         if tableName not in tables:
             query = self.__createTableQuery(tableName, data)
