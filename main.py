@@ -1,10 +1,10 @@
 import sys
-import json
 import traceback
 from robot import robot
-
+import json
 if __name__ == "__main__":
-    args = json.loads(str(sys.argv[1]))
+    args = eval(sys.argv[1].replace("'", '"'))
+    print(args)
     try:
         Robot = robot.Main(args)
         Robot.cleanup()
