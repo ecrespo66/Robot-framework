@@ -21,9 +21,12 @@ class Robot:
         if "https://" in self.url:
             self.httpprotocol = "https://"
             self.wsprotocol = "wss://"
+            self.url = self.url.replace("https://", "")
         else:
             self.httpprotocol = "http://"
             self.wsprotocol = "ws://"
+            self.url = self.url.replace("http://", "")
+
 
         response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/", {'username': self.username, 'password': self.password})
         self.token = response.json()['token']
