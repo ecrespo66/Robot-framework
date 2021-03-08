@@ -12,7 +12,6 @@ class Main(Robot):
         self.username = args['username']
         self.password = args['password']
         self.robotParameters = args['params']
-
         super().__init__(robotId=self.robotId, ExecutionId=self.ExecutionId, url=self.url,
                          username=self.username, password=self.password,
                          params=self.robotParameters)

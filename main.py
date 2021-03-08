@@ -4,7 +4,6 @@ from robot import robot
 import json
 if __name__ == "__main__":
     args = eval(sys.argv[1].replace("'", '"'))
-    print(args)
     try:
         Robot = robot.Main(args)
         Robot.cleanup()
