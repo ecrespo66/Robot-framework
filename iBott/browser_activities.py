@@ -37,7 +37,7 @@ class ChromeBrowser(Chrome):
     def open(self):
         '''
         This method opens Chrome browser to start the navigation.
-        Set Custom option before using this method.
+        Set Custom options before using this method.
         '''
         if self.undetectable:
             install(self.driver)
@@ -48,46 +48,48 @@ class ChromeBrowser(Chrome):
         super().__init__(self.driver, options=self.options)
 
     def ignoreImages(self):
-        '''Disable images in browser for a better performane'''
+        """Disable images in browser for a better performane"""
+
         prefs = {"profile.managed_default_content_settings.images": 2}
         self.options.add_experimental_option("prefs", prefs)
 
     def headless(self):
-        '''Hide Browser'''
+        """Hide Browser"""
+
         self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
         self.options.add_experimental_option('useAutomationExtension', False)
         self.options.add_argument("--headless")
 
     def saveCookies(self):
-        '''Save sesion cookies'''
+        """Save sesion cookies"""
+
         self.options.add_argument("--user-data-dir=selenium")
 
     def setProxy(self, proxy):
-        '''Use custom proxy'''
+        """Use custom proxy"""
+
         self.options.add_argument('--proxy-server=http://%s' % proxy)
 
     def setUserAgent(self, userAgent):
-        '''Change default user agent'''
+        """Change default user agent"""
+
         self.options.add_argument("user-agent=" + userAgent)
 
     def setprofile(self, path):
-        '''Use syste chrome profile
-        *Use this option if you are going to work with chrome plugins,'''
+        """Use syste chrome profile
+        *Use this option if you are going to work with chrome plugins for example"""
+
         self.options.add_argument("user-data-dir=" + path)  # Path to your chrome profile
 
-    def scrolldown(self, h=None):
-        '''Scroll down to % of the current page'''
-        if h is None:
-            h = 100
-        else:
-            h = int(h)
+    def scrolldown(self, h=100):
+        """Scroll down to % of the current page"""
+
+        h = int(h)
         to_height = self.execute_script("return document.body.scrollHeight")
-        to_height = int((to_height * h) / 100)
-
+        to_height = (to_height * h) / 100
         actual_height = self.execute_script("return document.documentElement.scrollTop")
-
         for i in range(actual_height, to_height, 100):
-            self.execute_script("window.scrollTo(0," + str(i) + ")")
+            self.execute_script(f'window.scrollTo(0,{str(i)})')
             time.sleep(0.1)
 
 
@@ -179,7 +181,8 @@ def get_chrome_version():
         with subprocess.Popen([executable_name, '--version'], stdout=subprocess.PIPE) as proc:
             version = proc.stdout.read().decode('utf-8').replace('Chromium', '').replace('Google Chrome', '').strip()
     elif platform == 'mac':
-        process = subprocess.Popen(['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '--version'], stdout=subprocess.PIPE)
+        process = subprocess.Popen(['/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '--version'],
+                                   stdout=subprocess.PIPE)
         version = process.communicate()[0].decode('UTF-8').replace('Google Chrome', '').strip()
     elif platform == 'win':
         process = subprocess.Popen(
@@ -294,6 +297,3 @@ def install(cwd=None):
     elif chromedriver_dir not in os.environ['PATH']:
         os.environ['PATH'] = chromedriver_dir + get_variable_separator() + os.environ['PATH']
     return chromedriver_filepath
-
-
-

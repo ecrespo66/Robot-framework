@@ -1,15 +1,16 @@
 import sys
 import traceback
 from robot import robot
-import json
+
 if __name__ == "__main__":
-    args = eval(sys.argv[1].replace("'", '"'))
+    if len(sys.argv) > 1:
+        args = eval(sys.argv[1].replace("'", '"'))
+    else:
+        args = None
     try:
         Robot = robot.Main(args)
-        Robot.cleanup()
-        Robot.init()
-        Robot.run()
-        Robot.end()
+        for method in Robot.methods:
+            method()
     except:
         for line in traceback.format_exc().splitlines():
             Robot.Log.systemException(str(line))
