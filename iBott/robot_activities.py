@@ -1,6 +1,5 @@
 import warnings
 import inspect
-from .dataBase_activities import *
 from .system_activities import id_generator
 from datetime import datetime
 import os
@@ -305,28 +304,6 @@ class RobotException(Exception):
     def find_method(self):
         pass
 
-
-
-'''
-class Robotmethod(object):
-    def __init__(cls, method):
-        cls.method = method
-        cls.__call__(cls.method)
-
-    def __call__(cls, method, counter=[0]):
-        method._order = counter[0]
-        counter[0] += 1
-        return method
-
-    def __call__(self, obj, *args, **kwargs):
-        return self._method(obj, *args, **kwargs)
- 
-    @classmethod
-    def get_allMethods(cls, module):
-        funcs = sorted((func for func in (getattr(module, name) for name in dir(module))
-                        if callable(func) and hasattr(func, "_order")), key=lambda func: func._order)
-        return funcs
-'''
 
 def Robotmethod(func, counter=[0]):
     func._order = counter[0]

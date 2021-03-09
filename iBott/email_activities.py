@@ -1,6 +1,5 @@
 import smtplib
 import ssl
-
 from imap_tools import MailBox, Q
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
