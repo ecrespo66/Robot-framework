@@ -30,6 +30,7 @@ class Main(Robot):
 
         self.browser = ChromeBrowser()
         self.browser.open()
+
         pass
 
     @Robotmethod
@@ -37,7 +38,23 @@ class Main(Robot):
         """Run robot process"""
 
         self.Log.log("Chrome Browser Oppen")
-        self.browser.get("http://google.com")
+        self.browser.get("https://google.com")
+        element = "/html/body/div[1]/div[3]/form/div[2]/div[1]/div[1]/div/div[2]/input"
+        texto = "gatitos"
+
+        self.browser.switch_to.frame(self.browser.find_element_by_tag_name("iframe"))
+
+        if self.browser.element_exists("Xpath", "//*[contains(text(),'Acepto')]"):
+            acceptButton = self.browser.find_element_by_xpath("//*[contains(text(),'Acepto')]")
+            acceptButton.click()
+        self.browser.switch_to.default_content()
+
+        elemento_buscador = self.browser.find_element_by_xpath(element)
+        # hacemos click sobre el elemento e introducimos el texto
+        elemento_buscador.click()
+        elemento_buscador.send_keys(texto)
+        #pulsamos el boton Enter
+        self.browser.enter(elemento_buscador)
 
     @Robotmethod
     def end(self):

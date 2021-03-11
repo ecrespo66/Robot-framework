@@ -12,6 +12,9 @@ if __name__ == "__main__":
         for method in Robot.methods:
             method()
     except:
-        for line in traceback.format_exc().splitlines():
-            Robot.Log.systemException(str(line))
-        Robot.Log.systemException("[Execution Failed]")
+        if len(sys.argv) > 1:
+            for line in traceback.format_exc().splitlines():
+                Robot.Log.systemException(str(line))
+            Robot.Log.systemException("[Execution Failed]")
+        else:
+            raise Exception

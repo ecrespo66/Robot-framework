@@ -1,6 +1,7 @@
 from .undetected_chromedriver import install
 from selenium.webdriver import Chrome
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 import chromedriver_autoinstaller
 import robot.settings as settings
 import time
@@ -91,6 +92,31 @@ class ChromeBrowser(Chrome):
             self.execute_script(f'window.scrollTo(0,{str(i)})')
             time.sleep(0.1)
 
+    def enter(self, element):
+        element.send_keys(Keys.ENTER)
+
+    def element_exists(self, method, selector):
+        if method.lower() == "xpath":
+            searchBy = By.XPATH
+        elif method.lower() == "id":
+            searchBy = By.ID
+        elif method.lower() == "link text":
+            searchBy = By.LINK_TEXT
+        elif method.lower() == "name":
+            searchBy = By.NAME
+        elif method.lower() == "tag name":
+            searchBy = By.TAG_NAME
+        elif method.lower() == "class name":
+            searchBy = By.CLASS_NAME
+        elif method.lower() == "css selector":
+            searchBy = By.CSS_SELECTOR
+        else:
+            raise Exception("Method not found")
+
+        if len(self.find_elements(searchBy, selector)) > 0:
+            return True
+        else:
+            return False
 
 def get_chromedriver_filename():
     """
