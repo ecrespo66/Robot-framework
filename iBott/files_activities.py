@@ -255,9 +255,9 @@ class Folder:
         """Get List of files, Returns array of File Objects"""
 
         FileList = []
-        for File in os.listdir(self.path):
+        for file in os.listdir(self.path):
             if File[0] != ".":
-                FileList.append(File(self.path + "/" + File))
+                FileList.append(File(self.path + "\\" + file))
         return FileList
 
     def downloadFile(self, url, name=None):

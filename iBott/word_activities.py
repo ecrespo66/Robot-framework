@@ -12,7 +12,7 @@ class Word(File):
 
         self.path = path
         self.document = self.__file()
-        super().__init__(self, path)
+        super().__init__(path)
 
     def save(self, path=None):
         """Save word document, receives path as optional argument to store document in a different location"""

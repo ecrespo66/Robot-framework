@@ -118,6 +118,7 @@ class ChromeBrowser(Chrome):
         else:
             return False
 
+
 def get_chromedriver_filename():
     """
     Returns the filename of the binary for the current platform.
