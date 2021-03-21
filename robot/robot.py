@@ -63,26 +63,31 @@ class Main(Robot):
         self.finishExecution()
 
 
-class BusinessException(Main, RobotException):
-    """Manage Exceptions Caused by business errors"""
+class BusinessException(RobotException):
+    '''Manage Exceptions Caused by business errors'''
 
-    def __init__(self, message, action):
+    def _init__(self,  message, action):
+        super().__init__(get_instances(Main), action)
         self.action = action
         self.message = message
         self.processException()
 
     def processException(self):
         self.Log.businessException(self.message)
-        pass
 
 
-class SystemException(Main, RobotException):
-    """Manage Exceptions Caused by system errors"""
+class SystemException(RobotException):
+    '''Manage Exceptions Caused by system errors'''
 
     def __init__(self, message, action):
+        super().__init__(get_instances(Main), action)
+        self.retry_times = settings.RETRY_TIMES
+        self.action = action
         self.message = message
+
         self.processException()
 
     def processException(self):
+        self.reestart(self.retry_times)
         self.Log.systemException(self.message)
-        pass
+
