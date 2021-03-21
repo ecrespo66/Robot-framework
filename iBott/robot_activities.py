@@ -1,5 +1,6 @@
 import warnings
 import inspect
+import gc
 from .system_activities import id_generator
 from datetime import datetime
 import os
@@ -293,16 +294,52 @@ class Item(Queue):
         self.itemExecutions += 1
 
 
+def get_all_Methods(module):
+    funcs = sorted((func for func in (getattr(module, name) for name in dir(module))
+                    if callable(func) and hasattr(func, "_order")), key=lambda func: func._order)
+    return funcs
+
+
 class RobotException(Exception):
     def __init__(self, cls, action):
-        self.__cls = cls
+        self.cls = cls
         self.action = action
+        self.methods = cls.methods
 
-    def get_cls_methods(self):
-        self.cls_methods = inspect.isroutine(self.cls)
+    def find_index_method(self):
+        methodsName = []
+        for method in self.methods:
+            methodsName.append(method.__name__)
+        return methodsName.index(self.action)
 
-    def find_method(self):
-        pass
+    def retry(self, retry_times):
+        index = self.find_index_method()
+        if self.count_retry_times() <= retry_times:
+            for i in range(index, len(self.methods) - 1):
+                self.methods[i]()
+        else:
+            raise Exception("Max retry times reached")
+
+    def jump_to_method(self, method, retry_times):
+        self.action = method
+        index = self.find_index_method()
+        if self.count_retry_times() <= retry_times:
+            for i in range(index, len(self.methods) - 1):
+                self.methods[i]()
+        else:
+            raise Exception("Max retry times reached")
+
+    def reestart(self, retry_times):
+        if self.count_retry_times() <= retry_times:
+            for method in self.methods:
+                method()
+            else:
+                raise Exception("Max retry times reached")
+
+    @staticmethod
+    def count_retry_times(counter=[0]):
+        counter[0] += 1
+        return counter[0]
 
 
 def Robotmethod(func, counter=[0]):
@@ -311,7 +348,7 @@ def Robotmethod(func, counter=[0]):
     return func
 
 
-def get_all_Methods(module):
-    funcs = sorted((func for func in (getattr(module, name) for name in dir(module))
-                    if callable(func) and hasattr(func, "_order")), key=lambda func: func._order)
-    return funcs
+def get_instances(cls):
+    for obj in gc.get_objects():
+        if isinstance(obj, cls):
+            return obj
