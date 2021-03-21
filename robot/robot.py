@@ -81,13 +81,11 @@ class SystemException(RobotException):
 
     def __init__(self, message, action):
         super().__init__(get_instances(Main), action)
-        self.retry_times = settings.RETRY_TIMES
+        self.retry_times = 1
         self.action = action
         self.message = message
-
         self.processException()
 
     def processException(self):
-        self.reestart(self.retry_times)
         self.Log.systemException(self.message)
 
