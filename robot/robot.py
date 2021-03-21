@@ -87,5 +87,7 @@ class SystemException(RobotException):
         self.processException()
 
     def processException(self):
+        """
         self.Log.systemException(self.message)
+        
 
