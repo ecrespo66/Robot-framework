@@ -1,8 +1,7 @@
 import warnings
-import inspect
+import gc
 from .system_activities import id_generator
 from datetime import datetime
-import os
 import requests
 import asyncio
 import json
@@ -17,19 +16,16 @@ class Robot:
         self.username = username
         self.password = password
         self.params = params
-        self.Log = self.Log(self)
-
         if self.url is not None:
             if "https://" in self.url:
                 self.httpprotocol = "https://"
                 self.wsprotocol = "wss://"
                 self.url = self.url.replace("https://", "")
-            elif "http://" in self.url:
+            else:
                 self.httpprotocol = "http://"
                 self.wsprotocol = "ws://"
                 self.url = self.url.replace("http://", "")
-        else:
-            warnings.warn('Robot Data Not set')
+        self.Log = self.Log(self)
 
         try:
             response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/",
@@ -137,16 +133,19 @@ class Queue:
         """Queue constructor"""
 
         self.token = token
-        self.url = url
         self.robotId = robotId
+        self.url = url
         self.__retryTimes = 1
         if self.url is not None:
             if "https://" in self.url:
                 self.httpprotocol = "https://"
                 self.wsprotocol = "wss://"
-            elif "http://" in self.url:
+                self.url = self.url.replace("https://", "")
+            else:
                 self.httpprotocol = "http://"
                 self.wsprotocol = "ws://"
+                self.url = self.url.replace("http://", "")
+
         else:
             warnings.warn('Robot Data Not set')
 
@@ -207,6 +206,17 @@ class Item(Queue):
 
         self.QueueId = queueId
         self.url = url
+        if self.url is not None:
+            if "https://" in self.url:
+                self.httpprotocol = "https://"
+                self.wsprotocol = "wss://"
+                self.url = self.url.replace("https://", "")
+            else:
+                self.httpprotocol = "http://"
+                self.wsprotocol = "ws://"
+                self.url = self.url.replace("http://", "")
+        else:
+            warnings.warn('Robot Data Not set')
         self.token = token
         self.itemExecutions = 0
         self.startDate = None
@@ -293,16 +303,52 @@ class Item(Queue):
         self.itemExecutions += 1
 
 
+def get_all_Methods(module):
+    funcs = sorted((func for func in (getattr(module, name) for name in dir(module))
+                    if callable(func) and hasattr(func, "_order")), key=lambda func: func._order)
+    return funcs
+
+
 class RobotException(Exception):
     def __init__(self, cls, action):
-        self.__cls = cls
+        self.cls = cls
         self.action = action
+        self.methods = cls.methods
 
-    def get_cls_methods(self):
-        self.cls_methods = inspect.isroutine(self.cls)
+    def find_index_method(self):
+        methodsName = []
+        for method in self.methods:
+            methodsName.append(method.__name__)
+        return methodsName.index(self.action)
 
-    def find_method(self):
-        pass
+    def retry(self, retry_times):
+        index = self.find_index_method()
+        if self.count_retry_times() <= retry_times:
+            for i in range(index, len(self.methods) - 1):
+                self.methods[i]()
+        else:
+            raise Exception("Max retry times reached")
+
+    def jump_to_method(self, method, retry_times):
+        self.action = method
+        index = self.find_index_method()
+        if self.count_retry_times() <= retry_times:
+            for i in range(index, len(self.methods) - 1):
+                self.methods[i]()
+        else:
+            raise Exception("Max retry times reached")
+
+    def reestart(self, retry_times):
+        if self.count_retry_times() <= retry_times:
+            for method in self.methods:
+                method()
+            else:
+                raise Exception("Max retry times reached")
+
+    @staticmethod
+    def count_retry_times(counter=[0]):
+        counter[0] += 1
+        return counter[0]
 
 
 def Robotmethod(func, counter=[0]):
@@ -311,7 +357,7 @@ def Robotmethod(func, counter=[0]):
     return func
 
 
-def get_all_Methods(module):
-    funcs = sorted((func for func in (getattr(module, name) for name in dir(module))
-                    if callable(func) and hasattr(func, "_order")), key=lambda func: func._order)
-    return funcs
+def get_instances(cls):
+    for obj in gc.get_objects():
+        if isinstance(obj, cls):
+            return obj

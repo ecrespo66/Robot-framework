@@ -1,5 +1,6 @@
-from iBott.robot_activities import Robot, RobotException, Robotmethod, get_all_Methods
+from iBott.robot_activities import Robot, RobotException, Robotmethod, get_all_Methods, get_instances
 from iBott.browser_activities import ChromeBrowser
+import robot.settings as settings
 
 
 class Main(Robot):
@@ -37,52 +38,40 @@ class Main(Robot):
     def process(self):
         """Run robot process"""
 
-        self.Log.log("Chrome Browser Oppen")
-        self.browser.get("https://google.com")
-        element = "/html/body/div[1]/div[3]/form/div[2]/div[1]/div[1]/div/div[2]/input"
-        texto = "gatitos"
-
-        self.browser.switch_to.frame(self.browser.find_element_by_tag_name("iframe"))
-
-        if self.browser.element_exists("Xpath", "//*[contains(text(),'Acepto')]"):
-            acceptButton = self.browser.find_element_by_xpath("//*[contains(text(),'Acepto')]")
-            acceptButton.click()
-        self.browser.switch_to.default_content()
-
-        elemento_buscador = self.browser.find_element_by_xpath(element)
-        # hacemos click sobre el elemento e introducimos el texto
-        elemento_buscador.click()
-        elemento_buscador.send_keys(texto)
-        #pulsamos el boton Enter
-        self.browser.enter(elemento_buscador)
 
     @Robotmethod
     def end(self):
         """Finish robot execution, cleanup environment, close applications and send reports"""
-        self.browser.close()
-        self.finishExecution()
 
 
-class BusinessException(Main, RobotException):
+
+class BusinessException(RobotException):
     """Manage Exceptions Caused by business errors"""
 
-    def __init__(self, message, action):
+    def _init__(self,  message, action):
+        super().__init__(get_instances(Main), action)
         self.action = action
         self.message = message
         self.processException()
 
     def processException(self):
+        """Write action when a Business exception occurs"""
+
         self.Log.businessException(self.message)
-        pass
 
 
-class SystemException(Main, RobotException):
+class SystemException(RobotException):
     """Manage Exceptions Caused by system errors"""
 
     def __init__(self, message, action):
+        super().__init__(get_instances(Main), action)
+        self.retry_times = settings.RETRY_TIMES
+        self.action = action
         self.message = message
         self.processException()
 
     def processException(self):
+        """Write action when a system exception occurs"""
+
+        self.reestart(self.retry_times)
         self.Log.systemException(self.message)
-        pass

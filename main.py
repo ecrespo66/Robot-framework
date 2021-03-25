@@ -11,6 +11,8 @@ if __name__ == "__main__":
         Robot = robot.Main(args)
         for method in Robot.methods:
             method()
+        Robot.finishExecution()
+
     except:
         if len(sys.argv) > 1:
             for line in traceback.format_exc().splitlines():
