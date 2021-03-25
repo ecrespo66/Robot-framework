@@ -103,7 +103,6 @@ class ChromeBrowser(Chrome):
             time.sleep(0.1)
 
 
-
     def enter(self, element):
         element.send_keys(Keys.ENTER)
 
