@@ -338,7 +338,7 @@ class RobotException(Exception):
         else:
             raise Exception("Max retry times reached")
 
-    def reestart(self, retry_times):
+    def restart(self, retry_times):
         if self.count_retry_times() <= retry_times:
             for method in self.methods:
                 method()
