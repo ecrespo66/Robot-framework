@@ -241,7 +241,7 @@ class Item(Queue):
                 item = requests.get(f'{self.httpprotocol}{self.url}/api/items/ItemId={self.itemId}',
                                     headers={'Authorization': f'Token {self.token}'}).json()
 
-                self.value = item['Value']
+                self.value = eval(item['Value'])
                 self.status = item['Status']
             except:
                 warnings.warn('Robot Data Not set')
