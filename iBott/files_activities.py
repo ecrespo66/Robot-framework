@@ -11,24 +11,24 @@ from shutil import copyfile
 
 class File:
     def __init__(self, path):
-        self.path = path.replace("/", "\\")
+        self.path = os.path.normpath(path).replace("\\", "/")
         self.exists = os.path.isfile(self.path)
-        self.fileName = self.path.split("\\")[-1]
+        self.fileName = self.path.split("/")[-1]
         if self.exists:
-            self.byteSize = self.__convert_bytes(os.stat(path).st_size)
-            self.creationTime = time.ctime(os.path.getctime(path))
-            self.modificationTime = time.ctime(os.path.getmtime(path))
+            self.byteSize = self.__convert_bytes(os.stat(self.path).st_size)
+            self.creationTime = time.ctime(os.path.getctime(self.path))
+            self.modificationTime = time.ctime(os.path.getmtime(self.path))
         else:
             self.byteSize = None
             self.creationTime = None
             self.modificationTime = None
 
     def rename(self, new_file_name):
-        """Rename file receives file name."""
+        """Rename file receives  new file name."""
 
         if os.path.isfile(self.path):
-            base_path = self.path.split("\\")[:-1]
-            new_path = "\\".join(base_path) + "\\" + new_file_name
+            base_path = self.path.split("/")[:-1]
+            new_path = "/".join(base_path) + "/" + new_file_name
         else:
             warnings.warn("File doesn't exists")
         if not os.path.exists(new_path):
@@ -40,13 +40,13 @@ class File:
     def move(self, new_location):
         """Move file to new location"""
 
-        new_path = "\\".join(new_location, self.fileName)
+        new_path = "/".join(new_location, self.fileName)
 
         if os.path.exists(self.path):
             if not os.path.exists(new_path):
                 os.rename(self.path, new_path)
         elif os.path.exists(new_path):
-            new_path = new_location + "\\" + "(" + str(uuid.uuid4())[:8] + ") " + self.fileName
+            new_path = new_location + "/" + "(" + str(uuid.uuid4())[:8] + ") " + self.fileName
             os.rename(self.path, new_path)
         self.path = new_path
 
@@ -63,14 +63,14 @@ class File:
             File will be copyed into current location"""
 
         if new_location is None:
-            new_location = self.path.replace(self.path.split("\\")[-1], "")
+            new_location = self.path.replace(self.path.split("/")[-1], "")
             new_path = new_location + "\\" + self.fileName
 
         if os.path.exists(self.path):
             if not os.path.exists(new_path):
                 copyfile(self.path, new_path)
             elif os.path.exists(new_path):
-                new_path = new_location + "\\" + "(" + str(uuid.uuid4())[:8] + ") " + self.fileName
+                new_path = new_location + "/" + "(" + str(uuid.uuid4())[:8] + ") " + self.fileName
                 copyfile(self.path, new_path)
 
     def waitFor(self):
@@ -94,11 +94,9 @@ class File:
 class PDF(File):
     def __init__(self, path):
         """PDF Constructor Heritates from File Class"""
-
         super().__init__(path)
         self.pages = PyPDF2.PdfFileReader(open(path, "rb")).getNumPages() - 1
         self.info = PyPDF2.PdfFileReader(open(path, "rb")).getDocumentInfo()
-        self.fileName = self.path.split("\\")[-1]
 
     def read_page(self, pageNum, encoding=None):
         """Read page from PDF, receives number of page to receive and encofing
@@ -125,7 +123,7 @@ class PDF(File):
         merger.write(merged_path)
         return
 
-    def spitPDF(self):
+    def spit(self):
         """Split pdf into multiple pages with format: pdfName_n.pdf"""
 
         pdf = PyPDF2.PdfFileReader(self.path)
@@ -147,7 +145,6 @@ class Image(File):
 
     def open(self):
         """Open Image"""
-
         im = PIL.Image.open(self.path)
         return im
 
@@ -185,16 +182,16 @@ class Folder:
     def __init__(self, path):
         """Instance folder Class. If folder doesn't exists it automatically creates a new one"""
 
-        self.path = path.replace("/", "\\")
+        self.path = os.path.normpath(path).replace("\\", "/")
         if not os.path.exists(self.path):
             os.makedirs(path)
-        self.name = path.split("\\")[-1:]
+        self.name = path.split("/")[-1:]
 
     def rename(self, new_folder_name):
         """Rename folder :receives new_folder_name as parameter"""
 
-        base_path = self.path.split("\\")[:-1]
-        new_path = "\\".join(base_path) + "\\" + new_folder_name
+        base_path = self.path.split("/")[:-1]
+        new_path = "/".join(base_path) + "/" + new_folder_name
         if not os.path.exists(new_path):
             os.rename(self.path, new_path)
         self.path = new_path
@@ -202,7 +199,7 @@ class Folder:
     def move(self, new_location):
         """Move folder to new location"""
 
-        new_path = new_location + "\\" + self.name
+        new_path = new_location + "/" + self.name
         if os.path.isdir(self.path):
             if not os.path.isdir(new_path):
                 os.rename(self.path, new_path)
@@ -235,8 +232,8 @@ class Folder:
          folder will be cloned into current directory"""
 
         if new_location is None:
-            new_location = self.path.replace(self.path.split("\\")[-1], "")
-        new_path = "\\".join(new_location, self.name)
+            new_location = self.path.replace(self.path.split("/")[-1], "")
+        new_path = "/".join(new_location, self.name)
         if os.path.isdir(self.path):
             if not os.path.isdir(new_path):
                 shutil.copytree(self.path, new_path)

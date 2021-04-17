@@ -1,5 +1,6 @@
 from iBott.robot_activities import Robot, RobotException, Robotmethod, get_all_Methods, get_instances
 from iBott.browser_activities import ChromeBrowser
+from iBott.email_activities import Mail
 import robot.settings as settings
 
 

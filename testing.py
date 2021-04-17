@@ -60,8 +60,6 @@ def gotopage(keyword, index):
 
         browser.close()
 
-
-
 keywords = ['perritos', 'gatitos', 'periquitos', 'caballitos']
 index = 0
 for keyword in keywords:
