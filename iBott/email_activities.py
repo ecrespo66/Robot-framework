@@ -1,11 +1,43 @@
 import smtplib
 import ssl
-from imap_tools import MailBox, Q
+from imap_tools import MailBox, Q, MailMessage
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from os.path import basename
 import os
+
+Query = Q
+
+
+def download_attachments(self, download_folder, extension=None):
+    '''
+    Download Mail attachments,
+    receives mail object and download folder.
+    '''
+
+    msg = self.obj
+    att_path = "No attachment found."
+    for part in msg.walk():
+        if part.get_content_maintype() == 'multipart':
+            continue
+        if part.get('Content-Disposition') is None:
+            continue
+        filename = part.get_filename()
+        if extension:
+            if extension in filename:
+                att_path = os.path.join(download_folder, filename)
+                if not os.path.isfile(att_path):
+                    fp = open(att_path, 'wb')
+                    fp.write(part.get_payload(decode=True))
+                    fp.close()
+        else:
+            att_path = os.path.join(download_folder, filename)
+            if not os.path.isfile(att_path):
+                fp = open(att_path, 'wb')
+                fp.write(part.get_payload(decode=True))
+                fp.close()
+    return att_path
 
 
 class Mail:
@@ -20,6 +52,7 @@ class Mail:
         self.smtp_port = smtp_port
         self.imap_server = imap_server
         self.imap_port = imap_port
+        setattr(MailMessage, 'download_attachments', download_attachments)
 
     def send(self, send_to, subject, text=None, html=None, files=None):
         '''Send mail to email acount
@@ -58,7 +91,7 @@ class Mail:
         smtp.sendmail(self.username, send_to, msg.as_string())
         smtp.close()
 
-    def fetchBox(self, folder=None, Query=None):
+    def fetch(self, folder=None, Query=None):
         '''Get list of emails from Mailbox server
         Folder-> Specific folder to extract emails
         Query-> Filter Emails from a Query
@@ -76,114 +109,4 @@ class Mail:
         mailbox.logout()
         return message_list
 
-    @staticmethod
-    def save_attachments(email, download_folder):
-        '''
-        Download Mail attachments,
-        receives mail object and download folder.
-        '''
-        msg = email.obj
-        att_path = "No attachment found."
-        for part in msg.walk():
-            if part.get_content_maintype() == 'multipart':
-                continue
-            if part.get('Content-Disposition') is None:
-                continue
-            filename = part.get_filename()
-            att_path = os.path.join(download_folder, filename)
-            if not os.path.isfile(att_path):
-                fp = open(att_path, 'wb')
-                fp.write(part.get_payload(decode=True))
-                fp.close()
-        return att_path
 
-
-'''import win32com
-import win32com.client
-    
-def folders():
-    outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace('MAPI')
-    
-    Folders={}
-    fList = [3,4,5,6,23]
-    for i in fList:
-        try:
-            folder = outlook.GetDefaultFolder(i)
-            Folders[folder.name] = i
-        except:
-            pass
-    
-    return(Folders)
-
-def accounts():
-    outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace('MAPI')
-    for account in outlook.Folders:
-        return account.name
-    
-
-class outlook:
-
-    def __init__ (self):
-        
-        self.outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
-        self.folders = folders()
-        self.accounts = accounts()
-        
-    def emails(self,folder):
-        
-        i= folders()[folder]
-        Folder= self.outlook.GetDefaultFolder(i)
-        messages = Folder.Items
-        
-        MessageList=[]
-        
-        for message in messages:
-            MessageList.append(message)
-        
-        return MessageList
-    
-    
-    def DownloadAttachments(self, email, folder, extension = None):    
-        
-        Attachments= email.Attachments
-        AttachmentNum = Attachments.Count
-        
-        
-        if AttachmentNum > 0:
-                
-            try:
-                for i in range(1,int(AttachmentNum)):
-                    
-                    fileType = str(Attachments.item(i)).split(".")[1]
-                    fileType = fileType.lower()
-                    
-                    if extension == None:
-                        if fileType != "png" and fileType != "jpg" and  fileType != "jpeg" and  fileType != "gif":
-
-                            Attachments.Item(i).SaveASFile(folder + str(Attachments.item(i)))
-                    else:
-                        
-                        if fileType == extension.replace(".",""):
-                            
-                            Attachments.Item(i).SaveASFile(folder + str(Attachments.item(i))) 
-            except:
-                pass
-            
-    
-    def SendEmail(self,To,Subject,Body, Attachment= None):
-        
-        
-        outlook = win32com.client.Dispatch('outlook.application')
-        mail = outlook.CreateItem(0)
-        mail.To = To
-        mail.Subject = Subject
-        mail.Body = Body
-        #mail.HTMLBody = '<h2>HTML Message body</h2>' #this field is optional
-        
-        if Attachment != None:
-            attachment  = Attachment 
-            mail.Attachments.Add(attachment)
-
-        mail.Send()
-    
-'''
