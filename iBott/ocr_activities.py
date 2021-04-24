@@ -1,3 +1,5 @@
+import os
+
 import pytesseract
 from PIL import Image
 import fitz
@@ -32,8 +34,8 @@ class OCR:
         else:
             foldName = foldName
 
-        file = file.replace('/', '\\')
-        folder = file.split("\\")[-1] + foldName
+        file = os.path.normpath(file).replace("\\", "/")
+        folder = file.split("/")[-1] + foldName
 
         folder = Folder(folder)
         image_matrix = fitz.Matrix(fitz.Identity)
@@ -42,13 +44,13 @@ class OCR:
         for i in range(0, pages):
             page = doc.loadPage(i)
             pix = page.getPixmap(alpha=False, matrix=image_matrix)
-            output = folder.path + '\\' + str(i) + ".png"
+            output = folder.path + '/' + str(i) + ".png"
             pix.writePNG(output)
 
         pics = folder.filelist()
         text = ""
         for i in range(0, len(pics)):
-            pic = folder.path + "\\" + str(i) + ".png"
+            pic = folder.path + "/" + str(i) + ".png"
             text += "\n" + self.readPicture(pic, lang)
         if foldName + "Temp":
             folder.remove()

@@ -504,7 +504,7 @@ class ChromeDriverManager(object):
         if self.__class__.installed:
             return
 
-        with io.open(self.executable_path, "r+b") as binary:
+        with io.__open(self.executable_path, "r+b") as binary:
             for line in iter(lambda: binary.readline(), b""):
                 if b"cdc_" in line:
                     binary.seek(-len(line), 1)

@@ -140,41 +140,41 @@ class Image(File):
         """Image constructor, heritates from File"""
 
         super().__init__(path)
-        self.size = self.open().size
-        self.format = self.open().format
+        self.size = self.__open().size
+        self.format = self.__open().format
 
-    def open(self):
+    def __open(self):
         """Open Image"""
-        im = PIL.Image.open(self.path)
+        im = PIL.Image.__open(self.path)
         return im
 
     def rotate(self, angle):
         """Rotate Image, receives angle as integer to rotate"""
 
-        im = self.open()
+        im = self.__open()
         return im.rotate(angle, expand=True).save(self.path)
 
     def resize(self, size):
         """Resize image. receives size a tuple as size"""
 
-        im = self.open()
+        im = self.__open()
         return im.resize(size).save(self.path)
 
     def crop(self, box=None):
         """Resize image. receives a tuple as box"""
 
-        im = self.open()
+        im = self.__open()
         return im.crop(box).save(self.path)
 
     def mirrorH(self):
         """Mirror Image horizontally."""
 
-        im = self.open()
+        im = self.__open()
         return im.transpose(PIL.Image.FLIP_LEFT_RIGHT).save(self.path)
 
     def mirrorV(self):
         """Mirror Image Vertically."""
-        im = self.open()
+        im = self.__open()
         return im.transpose(PIL.Image.FLIP_TOP_BOTTOM).save(self.path)
 
 

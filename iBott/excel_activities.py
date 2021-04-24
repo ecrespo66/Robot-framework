@@ -1,13 +1,16 @@
-import os, sys, subprocess
+import os
+import subprocess
+import sys
 from openpyxl import load_workbook, Workbook
+from iBott.files_activities import File
 
 
-class Excel:
+class Excel(File):
     def __init__(self, path):
         """Excel Constructor, receives path of excel,
          If excel doesn't exists it will be created automatically"""
 
-        self.path = path
+        super().__init__(path)
         if not os.path.exists(self.path):
             Workbook().save(self.path)
         else:
@@ -104,6 +107,8 @@ class Excel:
 
         if sheet:
             worksheet = self.workbook[sheet]
+            worksheet.cell(row=r, column=c).value = write_value
+            self.workbook.save(self.path)
         else:
             worksheet = self.workbook.active
             worksheet.cell(row=r, column=c).value = write_value
