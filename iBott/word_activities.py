@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from docx import *
 from docx.shared import Inches
 from docx.shared import Cm
@@ -9,10 +11,20 @@ from .files_activities import File
 class Word(File):
     def __init__(self, path):
         """Word document constructor, receives path as parameter"""
-
-        self.path = path
-        self.document = self.__file()
         super().__init__(path)
+        self.document = self.__file()
+
+    def open(self):
+        """Open excel file"""
+
+        if os.path.exists(self.path):
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, self.path])
+
+        elif not os.self.path.exists(self.path):
+            self.document.save(self.path)
+            opener = "open" if sys.platform == "darwin" else "xdg-open"
+            subprocess.call([opener, self.path])
 
     def save(self, path=None):
         """Save word document, receives path as optional argument to store document in a different location"""
@@ -42,10 +54,15 @@ class Word(File):
         self.document.add_paragraph(text, style=style)
         self.save()
 
-    def addPicture(self, path, width=None):
-        """Add image to word document, receives image path and widht as optional parameter"""
-
-        self.document.add_picture(path, width=width)
+    def addPicture(self, path, size=None):
+        """Add image to word document, receives image path and width as optional parameter"""
+        if size:
+            width = size[0]
+            height = size[1]
+        else:
+            width = None
+            height = None
+        self.document.add_picture(path, width=width, height=height)
         self.save()
 
     def addTable(self, list):

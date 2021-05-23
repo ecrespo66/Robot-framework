@@ -1,3 +1,4 @@
+import base64
 import os
 import string
 import random
@@ -31,3 +32,10 @@ def Wait(seconds=None):
     """Wait Seconds, receive number of seconds to wait"""
 
     time.sleep(seconds)
+
+def saveFileFromBase64(string, path):
+    string = string.split(",")[-1]
+    file = base64.b64decode(string)
+    f = open(path, "wb")
+    f.write(file)
+    f.close()

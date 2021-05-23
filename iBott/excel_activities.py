@@ -17,7 +17,7 @@ class Excel(File):
             self.workbook = load_workbook(self.path)
 
     def open(self):
-        """Open excel file if exists"""
+        """Open excel file"""
 
         if os.path.exists(self.path):
             opener = "open" if sys.platform == "darwin" else "xdg-open"
@@ -70,7 +70,7 @@ class Excel(File):
         :return array of sheets"""
         return self.workbook.sheetnames
 
-    def readCell(self, cell="A1", sheet=None):
+    def readCell(self, cell, sheet=None):
         """Read cell value, receives cell with format: A1 and name of the sheet as optional parameter.
         :returns String with value"""
 
@@ -90,7 +90,7 @@ class Excel(File):
             worksheet = self.workbook.active
         return worksheet.cell(row=r, column=c).value
 
-    def writeCell(self, sheet=None, cell="A1", value=None, autoSave=True):
+    def writeCell(self, cell, value, sheet=None,  autoSave=True):
         """Write cell value, receives cell with format: A1 and name of the sheet as optional parameter."""
 
         if sheet:
@@ -102,14 +102,13 @@ class Excel(File):
         if autoSave:
             self.workbook.save(self.path)
 
-    def writeRowCol(self, sheet=None, r=1, c=1, write_value='Value'):
+    def writeRowCol(self, r, c, value, sheet=None, autoSave=True):
         """Write cell value, receives cell with format: row = int col= int and sheet as optional parameter"""
 
         if sheet:
             worksheet = self.workbook[sheet]
-            worksheet.cell(row=r, column=c).value = write_value
-            self.workbook.save(self.path)
         else:
             worksheet = self.workbook.active
-            worksheet.cell(row=r, column=c).value = write_value
+        worksheet.cell(row=r, column=c).value = value
+        if autoSave:
             self.workbook.save(self.path)

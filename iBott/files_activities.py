@@ -113,7 +113,7 @@ class PDF(File):
             return text
 
     def merge(self, pdf_document2, merged_path):
-        """Append new pdf to currentone and store it as a new one."""
+        """Append new pdf to current and store it as a new one."""
 
         from PyPDF2 import PdfFileMerger
         pdfs = [str(self.path), str(pdf_document2)]
@@ -121,7 +121,6 @@ class PDF(File):
         for pdf in pdfs:
             merger.append(pdf)
         merger.write(merged_path)
-        return
 
     def spit(self):
         """Split pdf into multiple pages with format: pdfName_n.pdf"""
@@ -214,7 +213,6 @@ class Folder:
         if len(self.path) > 10 or allow_root:
             if os.path.isdir(self.path):
                 shutil.rmtree(self.path, ignore_errors=delete_read_only)
-        return
 
     def empty(self, allow_root=False):
         """Delete all files and folders in folder, receives allow_root as parameter"""
