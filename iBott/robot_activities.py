@@ -241,7 +241,7 @@ class Item(Queue):
                 item = requests.get(f'{self.httpprotocol}{self.url}/api/items/ItemId={self.itemId}',
                                     headers={'Authorization': f'Token {self.token}'}).json()
 
-                self.value = item['Value']
+                self.value = eval(item['Value'])
                 self.status = item['Status']
             except:
                 warnings.warn('Robot Data Not set')
@@ -338,7 +338,7 @@ class RobotException(Exception):
         else:
             raise Exception("Max retry times reached")
 
-    def reestart(self, retry_times):
+    def restart(self, retry_times):
         if self.count_retry_times() <= retry_times:
             for method in self.methods:
                 method()
