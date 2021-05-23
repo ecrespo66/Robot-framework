@@ -3,6 +3,8 @@ import os
 import string
 import random
 import time
+from iBott.files_activities import Folder
+import robot.settings as settings
 
 
 def KillProcess(process=None, name=None):
@@ -33,9 +35,12 @@ def Wait(seconds=None):
 
     time.sleep(seconds)
 
-def saveFileFromBase64(string, path):
-    string = string.split(",")[-1]
-    file = base64.b64decode(string)
-    f = open(path, "wb")
+
+def saveFileFromOrchestrator(string):
+    folder = Folder(settings.FILES_PATH)
+    base = string.split(",")[-1]
+    filename = string.split(",")[0]
+    file = base64.b64decode(base)
+    f = open(os.path.join(folder.path, filename), "wb")
     f.write(file)
     f.close()
