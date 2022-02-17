@@ -34,16 +34,21 @@ class Main(Robot):
         self.browser.open()
 
         pass
+    
+    
+    @Robotmethod
+    def get_transaction_data(self):
+        """Get data to be processed by robot"""
+        
 
     @Robotmethod
-    def process(self):
+    def process_transaction(self):
         """Run robot process"""
 
 
     @Robotmethod
     def end(self):
         """Finish robot execution, cleanup environment, close applications and send reports"""
-
 
 
 class BusinessException(RobotException):
