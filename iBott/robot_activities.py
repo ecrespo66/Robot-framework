@@ -1,176 +1,285 @@
-import warnings
-import gc
-from .system_activities import id_generator
+from pathlib import Path
+from .robot_flow import RobotFlow
+from .robot_excepcions import OrchestratorConnectionError
+from .files_activities import Folder
+from .system_activities import System
 from datetime import datetime
+import base64
+import os
 import requests
 import asyncio
 import json
 import websockets
+import warnings
 
 
-class Robot:
-    def __init__(self, robotId=None, ExecutionId=None, url=None, username=None, password=None, params=None):
-        self.robotId = robotId
-        self.ExecutionId = ExecutionId
-        self.url = url
-        self.username = username
-        self.password = password
-        self.params = params
-        if self.url is not None:
-            if "https://" in self.url:
-                self.httpprotocol = "https://"
-                self.wsprotocol = "wss://"
-                self.url = self.url.replace("https://", "")
-            else:
-                self.httpprotocol = "http://"
-                self.wsprotocol = "ws://"
-                self.url = self.url.replace("http://", "")
-        self.Log = self.Log(self)
+class Bot:
+    """
+    This class is used to interact with the iBott Orchestrator API.
+    :param robotId: The robot's ID.
+    :param ExecutionId: The execution ID.
+    :param url: The url of the iBott API.
+    :param username: The username of the iBott account.
+    :param password: The password of the iBott account.
+    :param orchestrator_parameters: Additional parameters sent from iBott Orchestrator.
+    """
+    warn_message = """"You must provide the robot's ID, execution ID, url, username and password to use Orquestrator features
+                set enviroment varibales for the connection with the following command:
+                python manage.py --add_credentials
+                """
 
-        try:
-            response = requests.post(f"{self.httpprotocol}{self.url}/api-token-auth/",
-                                     {'username': self.username, 'password': self.password})
-            self.token = response.json()['token']
-        except:
-            warnings.warn('Robot Data Not set')
+    def __init__(self, args=None):
+        if args:
+            self.robot_id = args['RobotId']
+            self.executionId = args['ExecutionId']
+            self.url = args['url']
+            self.username = args['username']
+            self.password = args['password']
+            self.orchestrator_parameters = args['params']
+            self.http_protocol = self.get_httpprotocol()
+            self.ws_protocol = self.__get_ws_protocol()
+            self.url = self.__get_url()
+            self.token = self.__get_token()
+            self.__headers = {'Authorization': f'Token {self.token}'}
+        else:
+            self.debug = True
+            warnings.warn(Bot.warn_message)
+
         self.queue = None
+        self.log = Log(self)
+        RobotFlow.connect_nodes()
 
-    def createQueue(self, queueName):
+    def __get_token(self):
+        """
+        This method is used to get the token of iBott Ochestrator API. It is used to authenticate the user.
+        :return: token
+        :rtype: str
+        """
         try:
-            queue = Queue(self.robotId, self.url, self.token, queueName=queueName)
+            response = requests.post(f"{self.http_protocol}{self.url}/api-token-auth/",
+                                     {'username': self.username, 'password': self.password})
+            return response.json()['token']
         except:
-            warnings.warn('Method createQueue fail -> Robot Data Not set')
-        return queue
+            Raise = OrchestratorConnectionError(f"Error while trying to connect to {self.url}")
 
-    def findQueueById(self, queueId):
-        try:
-            queue = Queue(self.robotId, self.url, self.token, queueId=queueId)
-        except:
-            warnings.warn('Method findQueueById fail -> Robot Data Not set')
-        return queue
+    def __get_protocol(self):
+        """
+        This method is used to get the protocol of the iBott API.
+        :return: http_protocol
+        """
+        if "https://" in self.url:
+            return "https://"
+        return "http://"
 
-    def findQueuesByName(self, queueName):
-        Queues = []
-        try:
-            queues = requests.get(f'{self.httpprotocol}{self.url}/api/queues/QueueName={queueName}/',
-                                  headers={'Authorization': f'Token {self.token}'}).json()
-            for queue in queues:
-                Queues.append(Queue(self.robotId, self.url, self.token, queueId=queue['QueueId']))
-        except:
-            warnings.warn('Method findQueuesByName fail -> Robot Data Not set')
-        return Queues
+    def __get_ws_protocol(self):
+        """
+        This method is used to get the websocket protocol of the iBott API.
+        :return: websocket protocol
+        """
+        if "https://" in self.url:
+            return "wss://"
+        return "ws://"
 
-    def finishExecution(self):
-        try:
-            asyncio.run(self.sendExecution("[Execution Over]"))
-        except:
-            warnings.warn('Method finishExecution fail -> Robot Data Not set')
+    def __get_url(self):
+        """
+        This method is used to get the url of the iBott API.
+        :return: url
+        """
+        if "https://" in self.url:
+            return self.url.replace("https://", "")
+        return self.url.replace("http://", "")
 
-    async def sendExecution(self, message, type='log'):
+    async def __send_message(self, message, log_type='log'):
+        """
+        Async method used to send a message to the orchestrator.
+        :param message:
+        :type message: str
+
+        :param log_type:
+        :type log_type: str
+        :return:
+        """
         await asyncio.sleep(0.01)
-        uri = f"{self.wsprotocol}{self.url}/ws/execution/{self.ExecutionId}/"
-        message = json.dumps({"message": {"type": type, "data": message, "executionId": self.ExecutionId}})
+        uri = f"{self.ws_protocol}{self.url}/ws/execution/{self.executionId}/"
+        message = json.dumps({"message": {"type": log_type, "data": message, "executionId": self.executionId}})
+
         async with websockets.connect(uri) as websocket:
             await websocket.send(str(message))
             try:
                 await asyncio.wait_for(websocket.recv(), timeout=10)
             except asyncio.TimeoutError:
-                await self.sendExecution(message, type)
+                await self.__send_message(message, log_type)
             await websocket.close()
 
-    class Log:
-        def __init__(self, robot):
-            self.robot = robot
+    def create_queue(self, queue_name):
+        """
+        This method is used to create a queue.
+        :param queue_name: The name of the queue.
+        :type queue_name: str
 
-        async def send(self, log, type):
+        :return: queue
+        :rtype: Queue object
+        """
+        queue = Queue(robot_id=self.robot_id, url=self.url, token=self.token, queueName=queue_name)
+        return queue
+
+    def find_queue_by_id(self, queueId):
+        """
+        This method is used to find a queue by its ID.
+
+        :param queueId: The ID of the queue.
+        :type queueId: str
+
+        :return: queue
+        :rtype: Queue object
+        """
+
+        queue = Queue(robot_id=self.robot_id, url=self.url, token=self.token, queueId=queueId)
+        return queue
+
+    def find_queues_by_name(self, queue_name):
+        """
+        This method is used to find queues by their name.
+
+        :param queue_name: The name of the queue.
+        :type queue_name: str
+
+        :return: queue_list
+        :rtype: list
+        """
+
+        queue_list = []
+        end_point = f'{self.http_protocol}{self.url}/api/queues/QueueName={queue_name}/'
+        queues = requests.get(end_point, headers=self.__headers)
+
+        for queue_data in queues.json():
+            queue = Queue(robot_id=self.robot_id, url=self.url, token=self.token, queueId=queue_data['QueueId'])
+            queue_list.append(queue)
+        return queue_list
+
+    @staticmethod
+    def save_file_from_orchestrator(string, folder=None):
+        """
+        This method is used to save a file sent to the robot executionfrom the orchestrator console.
+        :param string:
+        :param folder:
+        :return:
+        """
+        if folder is None:
+            folder = Folder(Path(os.path.dirname(os.path.realpath(__file__))).parent)
+        base = string.split(",")[-1]
+        filename = string.split(",")[0]
+        file = base64.b64decode(base)
+        f = open(os.path.join(folder.path, filename), "wb")
+        f.write(file)
+        f.close()
+
+    def finish_execution(self):
+        """
+        This method is used to finish the execution of the robot.
+        :return:
+        """
+        try:
+            asyncio.run(self.__send_message("[Execution Over]"))
+        except:
+            raise OrchestratorConnectionError("Orchestrator is not connected")
+
+
+class Log:
+    """
+    This class is used to log messages in the Orchestrator console.
+    :param args: same arguments as Bot Class
+    :type args: list
+    """
+
+    def __init__(self, robot):
+        self.robot = robot
+
+    def debug(self, log: str):
+        """
+        Send debug trace to ochestrator
+        :param log: Message to send to ochestrator
+        :type log: str
+        :return:
+        """
+        log_type = 'debug'
+        asyncio.run(self.send(log, log_type=log_type))
+
+    def trace(self, log: str):
+        """
+        Send trace to ochestrator
+        :param log: Message to send to ochestrator
+        :type log: str
+        :return:
+        """
+        log_type = 'log'
+        asyncio.run(self.send(log, log_type=log_type))
+
+    def info(self, log: str):
+        """Send info trace to orchestrator"""
+        log_type = 'info'
+        asyncio.run(self.send(log, log_type=log_type))
+
+    def system_exception(self, error: str):
+        """Send systemException trace to orchestrator"""
+        log_type = 'systemException'
+        asyncio.run(self.send(error, log_type=log_type))
+
+    def business_exception(self, error: str):
+        """Send businessException trace to orchestrator"""
+        log_type = 'businessException'
+        asyncio.run(self.send(error, log_type=log_type))
+
+    async def send(self, log: str, log_type: str):
+        if not self.robot.debug:
             try:
-                await self.robot.sendExecution(log, type=type)
+                await self.robot.__send_message(log, log_type=log_type)
             except:
-                warnings.warn('Method send fail -> Robot Data Not set')
-
-        def debug(self, log):
-            '''Send debug trace to ochestrator'''
-            try:
-                asyncio.run(self.send(log, type='debug'))
-            except:
-                warnings.warn('Method debug fail -> Robot Data Not set')
-
-        def log(self, log):
-            '''Send log trace to ochestrator'''
-
-            try:
-                asyncio.run(self.send(log, type='log'))
-            except:
-                warnings.warn('Method log fail -> Robot Data Not set')
-
-        def info(self, log):
-            '''send info trace to orchestrator'''
-
-            try:
-                asyncio.run(self.send(log, type='info'))
-            except:
-                warnings.warn('Method info fail -> Robot Data Not set')
-
-        def systemException(self, error):
-            '''send systemException trace to orchestrator'''
-
-            try:
-                asyncio.run(self.send(error, type="systemException"))
-            except:
-                warnings.warn('Method systemException fail -> Robot Data Not set')
-
-        def businessException(self, error):
-            '''send businessException trace to orchestrator'''
-
-            try:
-                asyncio.run(self.send(error, type="businesException"))
-            except:
-                warnings.warn('Method businessException fail -> Robot Data Not set')
+                raise OrchestratorConnectionError("Orchestrator is not connected")
+        else:
+            print(f'{log_type}: {log}')
 
 
 class Queue:
-    def __init__(self, robotId, url, token, queueName=None, queueId=None):
-        """Queue constructor"""
+    def __init__(self, *args, **kwargs):
+        """
+        Class to manage queues in Orchestrator.
+        With this class you can create, update and get queues from Orchestrator.
+        :param args:
+        :param kwargs:
+        """
+        self.token = kwargs.get("token")
+        self.robotId = kwargs.get("robot_id")
+        self.url = kwargs.get("url")
+        self.queueId = kwargs.get("queueId", None)
+        self.queueName = kwargs.get("queueName", None)
 
-        self.token = token
-        self.robotId = robotId
-        self.url = url
+        self.http_protocol = self.__get_protocol()
+        self.ws_protocol = self.__get_ws_protocol()
+        self.url = self.__get_url()
+        self.__headers = {'Authorization': f'Token {self.token}'}
+        self.__get_queue()
         self.__retryTimes = 1
-        if self.url is not None:
-            if "https://" in self.url:
-                self.httpprotocol = "https://"
-                self.wsprotocol = "wss://"
-                self.url = self.url.replace("https://", "")
-            else:
-                self.httpprotocol = "http://"
-                self.wsprotocol = "ws://"
-                self.url = self.url.replace("http://", "")
+
+    def __get_queue(self):
+        if self.queueId is None:
+            self.queueId = System.id_generator(16)
+            end_point = f'{self.http_protocol}{self.url}/api/queues/'
+            data = {
+                'RobotId': self.robotId,
+                'QueueId': self.queueId,
+                'QueueName': self.queueName
+            }
+            requests.post(end_point, data, headers=self.__headers)
 
         else:
-            warnings.warn('Robot Data Not set')
-
-        if queueId is None:
-            self.queueId = id_generator(16)
-            self.queueName = queueName
-            try:
-                requests.post(f'{self.httpprotocol}{self.url}/api/queues/',
-                              {'RobotId': self.robotId, 'QueueId': self.queueId, 'QueueName': self.queueName},
-                              headers={'Authorization': f'Token {self.token}'})
-            except:
-                warnings.warn('Robot Data Not set')
-
-        else:
-            self.queueId = queueId
-            try:
-                response = requests.get(f'{self.httpprotocol}{self.url}/api/queues/QueueId={self.queueId}/',
-                                        headers={'Authorization': f'Token {self.token}'})
-                self.queueName = response.json()['QueueName']
-            except:
-                warnings.warn('Robot Data Not set')
+            end_point = f'{self.http_protocol}{self.url}/api/queues/QueueId={self.queueId}/'
+            response = requests.get(end_point, headers=self.__headers)
+            self.queueName = response.json()['QueueName']
 
     def __getItem(self):
         """Get all items from Queue"""
-        queueItems = requests.get(f'{self.httpprotocol}{self.url}/api/items/QueueId={self.queueId}',
+        queueItems = requests.get(f'{self.http_protocol}{self.url}/api/items/QueueId={self.queueId}',
                                   headers={'Authorization': f'Token {self.token}'}).json()
 
         for Qitem in queueItems:
@@ -182,6 +291,21 @@ class Queue:
             if item.status == 'Pending':
                 item.setItemAsWorking()
                 yield item
+
+    def __get_protocol(self):
+        if "https://" in self.url:
+            return "https://"
+        return "http://"
+
+    def __get_ws_protocol(self):
+        if "https://" in self.url:
+            return "wss://"
+        return "ws://"
+
+    def __get_url(self):
+        if "https://" in self.url:
+            return self.url.replace("https://", "")
+        return self.url.replace("http://", "")
 
     def createItem(self, value):
         """Create New Item in The Orchestrator"""
@@ -216,23 +340,28 @@ class Item(Queue):
                 self.wsprotocol = "ws://"
                 self.url = self.url.replace("http://", "")
         else:
-            warnings.warn('Robot Data Not set')
+            pass
         self.token = token
         self.itemExecutions = 0
         self.startDate = None
         self.endDate = None
         if itemId is None:
-            self.itemId = id_generator(24)
+            self.itemId = System.id_generator(24)
             if type(value) is dict:
                 self.value = str(value)
                 self.status = 'Pending'
-                itemData = {'QueueId': self.QueueId, 'ItemId': self.itemId, 'Value': str(value),
-                            'Status': self.status, 'CreationTime': datetime.now()}
+                itemData = {
+                    'QueueId': self.QueueId,
+                    'ItemId': self.itemId,
+                    'Value': str(value),
+                    'Status': self.status,
+                    'CreationTime': datetime.now()
+                }
                 try:
                     requests.post(f'{self.httpprotocol}{self.url}/api/items/', itemData,
                                   headers={'Authorization': f'Token {self.token}'})
                 except:
-                    warnings.warn('Robot Data Not set')
+                    pass
             else:
                 raise ValueError("Item data must be a dictionary")
         else:
@@ -244,120 +373,45 @@ class Item(Queue):
                 self.value = eval(item['Value'])
                 self.status = item['Status']
             except:
-                warnings.warn('Robot Data Not set')
+                pass
+
+    def set_item_status(self):
+        try:
+            data = {"ItemId": self.itemId,
+                    "Status": self.status,
+                    'ResolutionTime': datetime.now()}
+            requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/',
+                         data,
+                         headers={'Authorization': f'Token {self.token}'}
+                         )
+        except Exception as e:
+            raise OrchestratorConnectionError(e)
 
     def setItemAsWorking(self):
         """Block current item """
         self.status = 'Working'
-        data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        try:
-            requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
-                         headers={'Authorization': f'Token {self.token}'})
-        except:
-            warnings.warn('Robot Data Not set')
+        self.set_item_status()
 
     def setItemAsOk(self):
         """Set Item status as OK"""
-
         self.status = 'OK'
-        data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        try:
-            requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
-                         headers={'Authorization': f'Token {self.token}'})
-        except:
-            warnings.warn('Robot Data Not set')
+        self.set_item_status()
 
     def setItemAsFail(self):
         """Set Item status as Fail"""
         self.status = 'Fail'
-        data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        try:
-            requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
-                         headers={'Authorization': f'Token {self.token}'})
-        except:
-            warnings.warn('Robot Data Not set')
+        self.set_item_status()
 
     def setItemAsWarn(self):
         """Set Item status as Warn"""
         self.status = 'Warn'
-        data = {"ItemId": self.itemId, "Status": self.status, 'ResolutionTime': datetime.now()}
-        try:
-            requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
-                         headers={'Authorization': f'Token {self.token}'})
-        except:
-            warnings.warn('Robot Data Not set')
+        self.set_item_status()
 
     def setItemAsPending(self):
         """Set Item status as Pending"""
         self.status = 'Pending'
-        data = {"ItemId": self.itemId, "Status": self.status}
-        try:
-            requests.put(f'{self.httpprotocol}{self.url}/api/items/{self.itemId}/', data,
-                         headers={'Authorization': f'Token {self.token}'})
-        except:
-            warnings.warn('Robot Data Not set')
+        self.set_item_status()
 
     def setItemExecution(self):
         """Set number of executrions"""
-
         self.itemExecutions += 1
-
-
-def get_all_Methods(module):
-    funcs = sorted((func for func in (getattr(module, name) for name in dir(module))
-                    if callable(func) and hasattr(func, "_order")), key=lambda func: func._order)
-    return funcs
-
-
-class RobotException(Exception):
-    def __init__(self, cls, action):
-        self.cls = cls
-        self.action = action
-        self.methods = cls.methods
-
-    def find_index_method(self):
-        methodsName = []
-        for method in self.methods:
-            methodsName.append(method.__name__)
-        return methodsName.index(self.action)
-
-    def retry(self, retry_times):
-        index = self.find_index_method()
-        if self.count_retry_times() <= retry_times:
-            for i in range(index, len(self.methods) - 1):
-                self.methods[i]()
-        else:
-            raise Exception("Max retry times reached")
-
-    def jump_to_method(self, method, retry_times):
-        self.action = method
-        index = self.find_index_method()
-        if self.count_retry_times() <= retry_times:
-            for i in range(index, len(self.methods) - 1):
-                self.methods[i]()
-        else:
-            raise Exception("Max retry times reached")
-
-    def restart(self, retry_times):
-        if self.count_retry_times() <= retry_times:
-            for method in self.methods:
-                method()
-            else:
-                raise Exception("Max retry times reached")
-
-    @staticmethod
-    def count_retry_times(counter=[0]):
-        counter[0] += 1
-        return counter[0]
-
-
-def Robotmethod(func, counter=[0]):
-    func._order = counter[0]
-    counter[0] += 1
-    return func
-
-
-def get_instances(cls):
-    for obj in gc.get_objects():
-        if isinstance(obj, cls):
-            return obj

@@ -14,7 +14,6 @@ import xml.etree.ElementTree as elemTree
 import logging
 import re
 from io import BytesIO
-
 logger = logging.getLogger(__name__)
 
 
@@ -102,7 +101,6 @@ class ChromeBrowser(Chrome):
             self.execute_script(f'window.scrollTo(0,{str(i)})')
             time.sleep(0.1)
 
-
     def enter(self, element):
         element.send_keys(Keys.ENTER)
 
@@ -128,7 +126,6 @@ class ChromeBrowser(Chrome):
             return True
         else:
             return False
-
 
 def get_chromedriver_filename():
     """
@@ -163,7 +160,6 @@ def get_platform_architecture():
     else:
         raise RuntimeError('Could not determine chromedriver download URL for this platform.')
     return platform, architecture
-
 
 def get_chromedriver_url(version):
     """

@@ -38,3 +38,4 @@ zipp==3.4.0
 zope.interface==5.2.0
 chromedriver-autoinstaller==0.2.2
 python-pptx==0.6.18
+pyflowchart~=0.2.3
