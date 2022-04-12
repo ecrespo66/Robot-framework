@@ -42,7 +42,7 @@ Arguments
 
 """
 from iBott import RobotFlow
-from iBott.robot_activities import Bot
+from iBott.robot_activities.base import Bot
 from robot.exceptions import BusinessException, SystemException
 from robot.flow import Nodes
 
@@ -53,15 +53,14 @@ class Robot(Bot):
     ----------------
     Robot class - Inherits from Bot class.
     ** Describe what the robot does **
-
     """
 
-    def __init__(self, args=None):
-        super().__init__(args)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.element_list = None
 
     @RobotFlow(Nodes.StartNode)
-    def start(self, *args, **kwargs):
+    def start(self):
         """
         start method
         ======================
@@ -74,9 +73,10 @@ class Robot(Bot):
             4. Open Applications
         """
 
-        self.log.trace("start Method")
         self.element_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        return
+        self.create_queue("transaction_data")
+        self.log.trace("start Method")
+
 
     @RobotFlow(Nodes.ConditionNode, parents=["process_data"], condition=lambda x: True if x else False)
     def get_transaction_data(self, *args, **kwargs):
@@ -85,20 +85,17 @@ class Robot(Bot):
         for element in self.element_list:
             self.element_list.remove(element)
             return element
-        return None
 
     @RobotFlow(Nodes.OnTrue, parents=["get_transaction_data"])
-    def process_data(self, *args, **kwargs):
+    def process_data(self, *args):
         """Run robot process"""
         data = args[0]
         self.log.trace(f"Start process_transaction_data Method for element: {data}")
-
         return data
 
-
     @RobotFlow(Nodes.OnFalse, parents=["get_transaction_data"])
-    def end(self, *args, **kwargs):
-        """Finish robot execution, cleanup environment, close applications and send reports
+    def end(self, *args):
         """
-        print("Start end Method")
-        return
+        Finish robot execution, cleanup environment, close applications and send reports
+        """
+        self.log.trace("end Method")

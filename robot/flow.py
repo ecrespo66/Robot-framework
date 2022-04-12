@@ -18,7 +18,7 @@ Default implementation of run:
 """
 
 from enum import Enum
-from iBott.robot_nodes import *
+from iBott.robot_activities.nodes import *
 
 
 class Nodes(Enum):

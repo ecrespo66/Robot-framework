@@ -1,4 +1,4 @@
-from iBott.robot_flow import RobotFlow
+from iBott.robot_activities.flow import RobotFlow
 import inspect
 import traceback
 
@@ -12,7 +12,7 @@ class RobotBaseException(Exception):
     def send_exception(self):
         for line in self.traceback.splitlines():
             self.robot.log.system_exception(str(line))
-            self.robot.log.system_exception("[Execution Failed]")
+        self.robot.log.system_exception("[Execution Failed]")
 
 
 class RobotException(Exception):

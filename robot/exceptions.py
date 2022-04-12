@@ -1,4 +1,4 @@
-from iBott.robot_excepcions import RobotException
+from iBott.robot_activities.exceptions import RobotException
 
 
 class BusinessException(RobotException):

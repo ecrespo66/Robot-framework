@@ -1,12 +1,13 @@
 import os
 from pathlib import Path
 
+
 ROBOT_FOLDER = Path(os.path.dirname(os.path.realpath(__file__))).parent
 
 """Folder to store Chrome Driver"""
 CHROMEDRIVER_PATH = os.path.join(ROBOT_FOLDER, "Driver")
 
-"""Emial General settings"""
+"""Email General settings"""
 EMAIL_ACCOUNT = None
 EMAIL_PASSWORD = None
 

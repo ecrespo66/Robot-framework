@@ -7,7 +7,8 @@ if not __name__ == '__main__':
 	from .email_activities import *
 	from .robot_activities import *
 	from .system_activities import *
-	from .robot_flow import *
-	from .robot_excepcions import *
+
+	from iBott.robot_activities.flow import *
+	from iBott.robot_activities.exceptions import *
 
 
