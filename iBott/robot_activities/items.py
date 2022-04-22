@@ -1,16 +1,15 @@
 import requests
 from datetime import datetime
 from iBott import OrchestratorConnectionError
-from iBott.robot_activities.server import OrchestratorAPI
 
 
-class Item(OrchestratorAPI):
+class Item(object):
     """
     Class to handle items. Heritates from OrchestratorAPI
     """
     def __init__(self, **kwargs):
         """Item constructor"""
-        super().__init__(kwargs)
+        self.connection = kwargs.get('connection')
         self.queue_id = kwargs.get('queue_id', None)
         self.start_date = kwargs.get('start_date', None)
         self.end_date = kwargs.get('end_date', None)
@@ -23,12 +22,12 @@ class Item(OrchestratorAPI):
 
     def set_item_status(self):
         """Set item status"""
-        endpoint = f'{self.ws_protocol}{self.url}/api/items/{self.item_id}/'
+        endpoint = f'{self.connection.ws_protocol}{self.connection.url}/api/items/{self.item_id}/'
         data = {"ItemId": self.item_id,
                 "Status": self.status,
                 'ResolutionTime': datetime.now()}
         try:
-            requests.put(endpoint, data, headers=self.headers)
+            requests.put(endpoint, data, headers=self.connection.headers)
         except Exception as exception_message:
             raise OrchestratorConnectionError(exception_message)
 
@@ -75,22 +74,22 @@ class Item(OrchestratorAPI):
     def __post_item(self):
         """Post new item"""
         self.status = 'Pending'
-        endpoint = f'{self.ws_protocol}{self.url}/api/items/'
+        endpoint = f'{self.connection.ws_protocol}{self.connection.url}/api/items/'
         item = {'QueueId': self.queue_id,
                 'ItemId': self.item_id,
                 'Value': str(self.item_data),
                 'Status': self.status,
                 'CreationTime': datetime.now()}
         try:
-            requests.post(endpoint, item, headers=self.headers)
+            requests.post(endpoint, item, headers=self.connection.headers)
         except Exception as exception_message:
             raise OrchestratorConnectionError(exception_message)
 
     def __get_item(self):
         """Get item data"""
         try:
-            endpoint = f'{self.ws_protocol}{self.url}/api/items/ItemId={self.item_id}'
-            item = requests.get(endpoint, headers=self.headers).json()
+            endpoint = f'{self.connection.ws_protocol}{self.connection.url}/api/items/ItemId={self.item_id}'
+            item = requests.get(endpoint, headers=self.connection.headers).json()
             self.value = eval(item['Value'])
             self.status = item['Status']
         except Exception as exception_message:

@@ -6,14 +6,10 @@ class BusinessException(RobotException):
     BusinessException is raised when the robot is doing something wrong.
 
     Arguments:
-        :param robot: The robot that is doing something wrong.
-        :type robot: Robot
-
-        :param message: The message that is being sent to the user.
-        :type message: str
-
-        :param next_action: The next action that the robot should do.
-        :type next_action: function"""
+        robot: Robot instance
+        message: Message sent to the user.
+        next_action:  Next action when the exception is raised.
+    """
 
     def _init__(self, *args, **kwargs):
         super.__init__(*args, **kwargs)
@@ -34,15 +30,10 @@ class SystemException(RobotException):
     SystemException is raised when the robot is doing something wrong.
 
     Arguments:
-        :param robot: The robot that is doing something wrong.
-        :type robot: Robot
-
-        :param message: The message that is being sent to the user.
-        :type message: str
-
-        :param next_action: The next action that the robot should do.
-        :type next_action: function"""
-
+        robot: Robot instance
+        message: Message sent to the user.
+        next_action:  Next action when the exception is raised.
+    """
     def _init__(self, *args, **kwargs):
         super.__init__(*args, **kwargs)
 

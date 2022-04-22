@@ -4,7 +4,7 @@ from iBott.robot_activities.items import Item
 from iBott.robot_activities.server import OrchestratorAPI
 
 
-class Queue(OrchestratorAPI):
+class Queue(object):
     """
     Class to manage queues in Orchestrator.
     With this class you can create, update and get queues from Orchestrator.
@@ -13,10 +13,11 @@ class Queue(OrchestratorAPI):
     """
 
     def __init__(self, **kwargs):
-        self.kwargs = kwargs
-        super().__init__(**self.kwargs)
-        self.queue_id = self.kwargs.get('queue_id', None)
-        self.queue_name = self.kwargs.get('queue_name', None)
+
+        self.connection = kwargs.get('connection')
+        self.queue_id = kwargs.get('queue_id', None)
+        self.queue_name = kwargs.get('queue_name', None)
+        self.robot_id = kwargs.get('robot_id', None)
         self.__get_queue()
         self.__retry_times = 1
 
@@ -28,17 +29,17 @@ class Queue(OrchestratorAPI):
         """
         if self.queue_id is None:
             self.queue_id = System.id_generator(size=16)
-            end_point = f'{self.http_protocol}{self.url}/api/queues/'
+            end_point = f'{self.connection.http_protocol}{self.connection.url}/api/queues/'
             data = {
                 'RobotId': self.robot_id,
                 'QueueId': self.queue_id,
                 'QueueName': self.queue_name
             }
-            requests.post(end_point, data, headers=self.headers)
+            requests.post(end_point, data, headers=self.connection.headers)
 
         else:
-            end_point = f'{self.http_protocol}{self.url}/api/queues/QueueId={self.queue_id}/'
-            response = requests.get(end_point, headers=self.headers)
+            end_point = f'{self.connection.http_protocol}{self.connection.url}/api/queues/QueueId={self.queue_id}/'
+            response = requests.get(end_point, headers=self.connection.headers)
             self.queue_name = response.json()['QueueName']
 
     def __getItem(self):
@@ -48,17 +49,16 @@ class Queue(OrchestratorAPI):
             Item: Yields pending items from Queue.
         """
 
-        endpoint = f'{self.http_protocol}{self.url}/api/items/QueueId={self.queue_id}'
+        endpoint = f'{self.connection.http_protocol}{self.connection.url}/api/items/QueueId={self.queue_id}'
 
         try:
-            queue_items = requests.get(endpoint, headers=self.headers).json()
+            queue_items = requests.get(endpoint, headers=self.connection.headers).json()
         except Exception as exception_message:
             raise OrchestratorConnectionError(exception_message)
 
         for qitem in queue_items:
-            self.kwargs['item_id'] = qitem['ItemId']
-            self.kwargs['queue_id'] = self.queue_id
-            item = Item(self.kwargs)
+
+            item = Item(connection=self.connection, queue_id=self.queue_id, item_id=qitem['ItemId'])
 
             if item.status == 'Fail' and item.item_executions < self.__retry_times:
                 item.set_item_executions()
@@ -73,8 +73,7 @@ class Queue(OrchestratorAPI):
         Arguments:
             item_data: Dictionary with the item data.
         """
-        self.kwargs['item_data'] = item_data
-        item = Item(self.kwargs)
+        item = Item(connection=self.connection, queue_id=self.queue_id, item_data=item_data)
         return item
 
     def get_next_item(self):

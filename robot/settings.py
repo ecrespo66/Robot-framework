@@ -1,10 +1,8 @@
 import os
 from pathlib import Path
 
-
+"""Folders to store Chrome Driver DON'T CHANGE"""
 ROBOT_FOLDER = Path(os.path.dirname(os.path.realpath(__file__))).parent
-
-"""Folder to store Chrome Driver"""
 CHROMEDRIVER_PATH = os.path.join(ROBOT_FOLDER, "Driver")
 
 """Email General settings"""

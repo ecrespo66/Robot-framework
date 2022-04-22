@@ -1,22 +1,15 @@
-from inspect import getclosurevars, getsource
-from collections import ChainMap
-from textwrap import dedent
-import ast
-
-
-class RobotFlow:
+class RobotFlow(object):
     """
-    RobotFlow is a class that allows you to define a flow of the robot
+    RobotFlow is a class that allows you to define the flow of you process
     it is used as decorator for the methods of the robot class.
-        arguments
-            :param node: the node of the flow
-            :type object: Node class
-
-            :param counter autoRegister position of the method in the flow
-            :type int
-
-            :param method get the method decorated with @RobotFlow
-            :type function
+        Arguments:
+            method: the method that will be decorated by the flow
+            node: the node that will be used to execute the method
+            counter: autoincrement counter for the methods of robot classmethods
+            parents (optional): list of parent nodes
+            condition (optional): conditional function to execute the method
+        Returns:
+            List of nodes that will be executed
     """
 
     nodes = []
@@ -119,7 +112,6 @@ class RobotFlow:
 
     @classmethod
     def generate_documentation(cls):
-
         flow_str = "\n# FLOW CHART\n```mermaid\nflowchart LR"
         for node in cls.nodes:
             flow_str += "\n" + node.node_object
@@ -127,7 +119,6 @@ class RobotFlow:
             for c in node.node_flows:
                 flow_str += "\n" + c
         flow_str += "\n```"
-
         flow_str += "\n# FLOW NODES"
         for node in cls.nodes:
             flow_str += f"\n## NODE: {node.name}"
@@ -135,50 +126,3 @@ class RobotFlow:
                 flow_str += f"\n {node.doc}"
         return flow_str
 
-    @staticmethod
-    def get_exceptions(func, ids=set()):
-        try:
-            vars = ChainMap(*getclosurevars(func)[:3])
-            source = dedent(getsource(func))
-        except TypeError:
-            return
-
-        class _visitor(ast.NodeTransformer):
-            def __init__(self):
-                self.nodes = []
-                self.other = []
-
-            def visit_Raise(self, n):
-                self.nodes.append(n.exc)
-
-            def visit_Expr(self, n):
-                if not isinstance(n.value, ast.Call):
-                    return
-                c, ob = n.value.func, None
-                if isinstance(c, ast.Attribute):
-                    parts = []
-                    while getattr(c, 'value', None):
-                        parts.append(c.attr)
-                        c = c.value
-                    if c.id in vars:
-                        ob = vars[c.id]
-                        for name in reversed(parts):
-                            ob = getattr(ob, name)
-
-                elif isinstance(c, ast.Name):
-                    if c.id in vars:
-                        ob = vars[c.id]
-
-                if ob is not None and id(ob) not in ids:
-                    self.other.append(ob)
-                    ids.add(id(ob))
-
-        v = _visitor()
-        v.visit(ast.parse(source))
-        for n in v.nodes:
-            if isinstance(n, (ast.Call, ast.Name)):
-                name = n.id if isinstance(n, ast.Name) else n.func.id
-                if name in vars:
-                    print(name)
-
-                    yield vars[name]

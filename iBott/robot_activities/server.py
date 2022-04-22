@@ -3,7 +3,6 @@ import json
 import os
 import warnings
 from pathlib import Path
-
 import requests
 import websockets
 from iBott.robot_activities.exceptions import OrchestratorConnectionError
@@ -16,8 +15,6 @@ class OrchestratorAPI:
     """
 
     def __init__(self, **kwargs):
-        self.robot_id = kwargs.get('RobotId', None)
-        self.executionId = kwargs.get('ExecutionId', None)
         self.url = kwargs.get('url', None)
         self.username = kwargs.get('username', None)
         self.password = kwargs.get('password', None)
@@ -32,6 +29,11 @@ class OrchestratorAPI:
         self.headers = {'Authorization': f'Token {self.token}'}
 
     def __check_connection(self):
+        """
+        This method is used to check if the connection with the orchestrator is working.
+        Returns:
+             True if the connection is working, False otherwise.
+        """
         if self.username is None:
             self.debug = True
             folder = Path(os.path.dirname(os.path.realpath(__file__))).parent.parent
@@ -44,9 +46,7 @@ class OrchestratorAPI:
                 self.password = self.debug_data["IBOTT_PASSWORD"]
                 self.url = self.debug_data['URL']
                 self.robot_id = self.debug_data['ROBOT_ID']
-                warnings.warn(f"Using debug file: {debug_file} to connect to the orchestrator, pleache check the variables in debug.json ")
-
-
+                warnings.warn(f"Using debug file:{debug_file} to connect to the orchestrator, please check the variables in debug.json ")
             except:
                 warnings.warn("No username or password provided.Please Set them in debug.json")
                 return False
@@ -57,7 +57,6 @@ class OrchestratorAPI:
         This method is used to get the token of iBott Ochestrator API. It is used to authenticate the user.
         Returns:
             token: str
-
         """
         endpoint = f"{self.http_protocol}{self.url}/api-token-auth/"
         user_data = {'username': self.username, 'password': self.password}
@@ -70,7 +69,8 @@ class OrchestratorAPI:
     def __get_protocol(self):
         """
         This method is used to get the protocol of the iBott API.
-        :return: http_protocol
+        Returns:
+            http_protocol: str
         """
         if "https://" in self.url:
             return "https://"
@@ -79,7 +79,8 @@ class OrchestratorAPI:
     def __get_ws_protocol(self):
         """
         This method is used to get the websocket protocol of the iBott API.
-        :return: websocket protocol
+        Returns:
+             websocket protocol
         """
         if "https://" in self.url:
             return "wss://"
@@ -88,21 +89,21 @@ class OrchestratorAPI:
     def __get_url(self):
         """
         This method is used to get the url of the iBott API.
-        :return: url
+        Returns:
+            url: str
         """
         if "https://" in self.url:
             return self.url.replace("https://", "")
         return self.url.replace("http://", "")
 
-    async def __send_message(self, message, log_type='log'):
+    async def send_message(self, message, log_type='log'):
         """
         Async method used to send a message to the orchestrator.
-        :param message:
-        :type message: str
-
-        :param log_type:
-        :type log_type: str
-        :return:
+        Arguments:
+            message: str
+            log_type: str
+        Returns:
+            response: dict
         """
         await asyncio.sleep(0.01)
         uri = f"{self.ws_protocol}{self.url}/ws/execution/{self.executionId}/"
@@ -113,12 +114,18 @@ class OrchestratorAPI:
             try:
                 await asyncio.wait_for(websocket.recv(), timeout=10)
             except asyncio.TimeoutError:
-                await self.__send_message(message, log_type)
+                await self.send_message(message, log_type)
             await websocket.close()
 
     @classmethod
     def get_args(cls, args):
-        """Get arguments from command line"""
+        """
+        Get arguments from command line
+        Arguments:
+            args: list
+        Returns:
+            args: dict
+            """
         if len(args) > 1:
             args = eval(args[1].replace("'", '"'))
         else:

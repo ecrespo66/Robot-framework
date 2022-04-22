@@ -7,12 +7,12 @@ class Log:
     """
     This class is used to log messages in the Orchestrator console.
     Arguments:
-        robot: The robot object.
+        connection: Connection instance to orchestrator.
 
     """
 
-    def __init__(self, robot):
-        self.robot = robot
+    def __init__(self, connection):
+        self.connection = connection
 
     def debug(self, log: str):
         """
@@ -80,9 +80,9 @@ class Log:
         Raise:
             OrchestratorConnectionError: If the connection with the orchestrator is not established.
         """
-        if not self.robot.debug:
+        if not self.connection.debug:
             try:
-                await self.robot.__send_message(log, log_type=log_type)
+                await self.connection.send_message(log, log_type=log_type)
             except:
                 raise OrchestratorConnectionError("Orchestrator is not connected")
         else:

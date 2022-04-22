@@ -2,7 +2,6 @@ import base64
 import os
 import requests
 import asyncio
-import warnings
 from pathlib import Path
 from iBott import OrchestratorConnectionError
 from iBott.robot_activities.assets import Asset
@@ -13,7 +12,7 @@ from iBott.robot_activities.queues import Queue
 from iBott.robot_activities.server import OrchestratorAPI
 
 
-class Bot(OrchestratorAPI):
+class Bot(object):
     """
     This class is used to interact with the iBott Orchestrator API.
     Arguments:
@@ -21,10 +20,11 @@ class Bot(OrchestratorAPI):
     """
     def __init__(self, **kwargs):
         self.kwargs = kwargs
-        super().__init__(**self.kwargs)
-        self.log = Log(self)
+        self.connection = OrchestratorAPI(**self.kwargs)
+        self.robot_id = kwargs.get('RobotId', None)
+        self.execution_id = kwargs.get('ExecutionId', None)
+        self.log = Log(self.connection)
         self.queue = None
-
         RobotFlow.connect_nodes()
 
     def create_queue(self, queue_name: str):
@@ -35,8 +35,7 @@ class Bot(OrchestratorAPI):
         Returns:
             queue object.
         """
-        self.kwargs['queue_name'] = queue_name
-        queue = Queue(**self.kwargs)
+        queue = Queue(connection=self.connection, robot_id=self.robot_id, queue_name=queue_name)
         return queue
 
     def find_queue_by_id(self, queue_id: str):
@@ -48,9 +47,7 @@ class Bot(OrchestratorAPI):
             Queue object: The Queue where items are stored in
 
         """
-        kwargs = self.kwargs
-        kwargs['queue_id'] = queue_id
-        queue = Queue(**kwargs)
+        queue = Queue(self.connection, robot_id=self.robot_id, queue_id=queue_id)
         return queue
 
     def find_queues_by_name(self, queue_name: str):
@@ -62,55 +59,36 @@ class Bot(OrchestratorAPI):
             list: A list of Queue objects.
         """
         queue_list = []
-        kwargs = self.kwargs
-        end_point = f'{self.http_protocol}{self.url}/api/queues/QueueName={queue_name}/'
+        end_point = f'{self.connection.http_protocol}{self.connection.url}/api/queues/QueueName={queue_name}/'
         try:
-            queues = requests.get(end_point, headers=self.headers)
+            queues = requests.get(end_point, headers=self.connection.headers)
         except:
             raise OrchestratorConnectionError("Orchestrator is not connected")
         for queue_data in queues.json():
-            kwargs['queue_id'] = queue_data['QueueId']
-            queue = Queue(**kwargs)
+            queue = Queue(connection=self.connection, queue_id=queue_data['QueueId'])
             queue_list.append(queue)
         return queue_list
 
-    def get_asset_by_name(self, assets_name):
-        endpoint = f"{self.http_protocol}{self.url}/api/assets/credential_name = {assets_name}"
-        response = requests.get(endpoint, headers=self.headers)
-        asset = response.json()
-        kwargs = self.kwargs
-        kwargs["credential_id"] = asset['credential_id']
-        kwargs["credential_name"] = asset['credential_name']
-        kwargs["credential_type"] = asset['credential_type']
-        if asset['credential_type'] == "Credential":
-            kwargs["username"] = asset['data_1']
-            kwargs["password"] = asset['data_2']
-        else:
-            kwargs["data"] = asset['data_1']
-        return Asset(**kwargs)
+    def get_asset_by_name(self, asset_name: str):
+        """
+        This method is used to find an asset by its name.
+        Arguments:
+            asset_name: The name of the asset.
+        Returns:
+            Asset object: The Asset object.
+        """
+        return Asset(connection=self.connection, asset_name=asset_name)
 
-        return
+    def get_asset_by_id(self, asset_id: str):
+        """
+        This method is used to find an asset by its ID.
+        Arguments:
+            asset_id: The ID of the asset.
+        Returns:
+            Asset object: The Asset object.
+        """
+        return Asset(connection=self.connection, asset_id=asset_id)
 
-    def get_asset_by_id(self, assets_id):
-        endpoint = f"{self.http_protocol}{self.url}/api/assets/credential_id = {assets_id}"
-        try:
-            response = requests.get(endpoint, headers=self.headers)
-            asset = response.json()
-            kwargs = self.kwargs
-            kwargs["credential_id"] = asset['credential_id']
-            kwargs["credential_name"] = asset['credential_name']
-            kwargs["credential_type"] = asset['credential_type']
-            if asset['credential_type'] == "Credential":
-                kwargs["username"] = asset['data_1']
-                kwargs["password"] = asset['data_2']
-            else:
-                kwargs["data"] = asset['data_1']
-            return Asset(**kwargs)
-        except Exception as e:
-            raise
-
-
-        return
     @staticmethod
     def save_file_from_orchestrator(string, folder=None):
         """
@@ -138,7 +116,7 @@ class Bot(OrchestratorAPI):
             None
         """
         try:
-            asyncio.run(self.__send_message("[Execution Over]"))
+            asyncio.run(self.connection.send_message("[Execution Over]"))
         except:
             raise OrchestratorConnectionError("Orchestrator is not connected")
 

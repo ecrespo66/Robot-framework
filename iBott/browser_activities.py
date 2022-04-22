@@ -14,6 +14,7 @@ import xml.etree.ElementTree as elemTree
 import logging
 import re
 from io import BytesIO
+
 logger = logging.getLogger(__name__)
 
 
@@ -127,6 +128,7 @@ class ChromeBrowser(Chrome):
         else:
             return False
 
+
 def get_chromedriver_filename():
     """
     Returns the filename of the binary for the current platform.
@@ -160,6 +162,7 @@ def get_platform_architecture():
     else:
         raise RuntimeError('Could not determine chromedriver download URL for this platform.')
     return platform, architecture
+
 
 def get_chromedriver_url(version):
     """

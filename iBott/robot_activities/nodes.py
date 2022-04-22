@@ -10,6 +10,7 @@ class RobotNode:
         self.method = kwargs.get("method")
         self.position = kwargs.get("position")
         self.parent_nodes = kwargs.get("parents", None)
+        self.node_type = "OperationNode"
         self.name = self.method.__name__
         self.exception_type = None
         self.on_exception_node = None
@@ -50,8 +51,9 @@ class StartClass(RobotNode):
     """
     def __init__(self, **kwargs):
         """Initialize Node Class """
-        self.node_type = "StartNode"
         super().__init__(**kwargs)
+        self.node_type = "StartNode"
+
         self.node_object = f"{str(self.position)}(({self.name}))"
         if self.position > 0:
             raise ValueError("Start Node must be in first position of the flow")
@@ -65,8 +67,8 @@ class EndClass(RobotNode):
     :type **kwargs:
     """
     def __init__(self, **kwargs):
-        self.node_type = "EndNode"
         super().__init__(**kwargs)
+        self.node_type = "EndNode"
         self.node_object = f"{str(self.position)}([{self.name}])"
 
     def connect(self, **kwargs):
@@ -92,8 +94,8 @@ class OperationClass(RobotNode):
     """
 
     def __init__(self, **kwargs):
-        self.node_type = "OperationNode"
         super().__init__(**kwargs)
+        self.node_type = "OperationNode"
         self.node_object = f"{str(self.position)}[{self.name}]"
 
 
@@ -106,8 +108,8 @@ class OnTrueClass(RobotNode):
     """
 
     def __init__(self, **kwargs):
-        self.node_type = "OnTrueNode"
         super().__init__(**kwargs)
+        self.node_type = "OnTrueNode"
         self.node_object = f"{str(self.position)}[{self.name}]"
 
 
@@ -145,8 +147,8 @@ class ConditionClass(RobotNode):
     """
 
     def __init__(self, **kwargs):
-        self.node_type = "ConditionNode"
         super().__init__(**kwargs)
+        self.node_type = "ConditionNode"
         self.node_object = str(self.position) + "{" + self.name + "}"
         self.condition = kwargs.get("function")
         self.on_true_node = None

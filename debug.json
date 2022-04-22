@@ -1,7 +1,7 @@
 {
-  "URL": "https://ibot-automation.herokuapp.com",
-  "ROBOT_ID": "131O9BDQE20F",
+  "URL": "http://127.0.0.1:8000",
+  "ROBOT_ID": "WAXOZQ57LYAT",
   "IBOTT_USERNAME": "enriquecrespodebenito",
   "IBOTT_PASSWORD": "Mariquinah3",
-  "QUEUE_ID": "SHN8OL7OP80KCGTY"
+  "QUEUE_ID": ""
 }
