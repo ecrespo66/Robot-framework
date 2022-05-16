@@ -31,8 +31,6 @@ class OrchestratorAPI:
         self.token = self.__get_token()
         self.headers = {'Authorization': f'Token {self.token}'}
 
-
-
     def __check_connection(self):
         """
         This method is used to check if the connection with the orchestrator is working.
