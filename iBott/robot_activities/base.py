@@ -3,10 +3,9 @@ import os
 import requests
 import asyncio
 from pathlib import Path
-from iBott import OrchestratorConnectionError
 from iBott.robot_activities.assets import Asset
 from iBott.robot_activities.flow import RobotFlow
-from iBott.files_activities import Folder
+from iBott.files_and_folders.folders import Folder
 from iBott.robot_activities.logs import Log
 from iBott.robot_activities.queues import Queue
 from iBott.robot_activities.server import OrchestratorAPI
@@ -16,7 +15,23 @@ class Bot(object):
     """
     This class is used to interact with the iBott Orchestrator API.
     Arguments:
-        kwargs: dictionary of arguments to be passed to the API.
+        RobotId: The ID of the robot.
+        ExecutionId: The ID of the execution.
+    Attributes:
+        connection: The connection to the Orchestrator API.
+        robot_id: The ID of the robot.
+        execution_id: The ID of the execution.
+        log: log class instance.
+        queue: queue class instance.
+    Methods:
+        create_queue(queue_name): Create a queue.
+        find_queue_by_id(queue_id): Find a queue by its ID.
+        find_queues_by_name(queue_name): Find all queues by its name.
+        get_asset_by_name(asset_name): Get an asset by its name.
+        get_asset_by_id(asset_id): Get an asset by its ID.
+        save_file_from_orchestrator(file_path, file_name): Save a file from the Orchestrator API.
+        finish_execution(): Finish the execution in the Orchestrator API.
+
     """
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -63,7 +78,7 @@ class Bot(object):
         try:
             queues = requests.get(end_point, headers=self.connection.headers)
         except:
-            raise OrchestratorConnectionError("Orchestrator is not connected")
+            raise Exception("Orchestrator is not connected")
         for queue_data in queues.json():
             queue = Queue(connection=self.connection, queue_id=queue_data['QueueId'])
             queue_list.append(queue)
@@ -118,7 +133,7 @@ class Bot(object):
         try:
             asyncio.run(self.connection.send_message("[Execution Over]"))
         except:
-            raise OrchestratorConnectionError("Orchestrator is not connected")
+            raise self.log.info("Orchestrator is not connected")
 
 
 

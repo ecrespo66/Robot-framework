@@ -89,6 +89,12 @@ class RobotException(Exception):
         """
         self.node.next_node.run(self.robot)
 
+    def stop(self):
+        """
+        stop the current node
+        """
+        self.nodes[-1].run(self.robot)
+
     @staticmethod
     def count_retry_times(counter=[0]):
         """

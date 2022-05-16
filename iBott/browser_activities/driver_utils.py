@@ -1,132 +1,16 @@
-from selenium.webdriver import Chrome
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-import robot.settings as settings
-import time
-from selenium.webdriver.common.keys import Keys
-import sys
+import io
+import logging
 import os
 import subprocess
 import urllib.request
 import urllib.error
 import zipfile
 import xml.etree.ElementTree as elemTree
-import logging
+import tarfile
+import sys
 import re
 from io import BytesIO
-
 logger = logging.getLogger(__name__)
-
-
-class ChromeBrowser(Chrome):
-    '''
-    If chrome driver path is None, then it will check for Chrome Driver path in settings.
-    Set undetectable True as flag to make chrome browser undetectable for antispam systems.
-    '''
-
-    def __init__(self, pathDriver=None, undetectable=False):
-        self.CurrentPath = os.path.dirname(__file__)
-        if not pathDriver:
-            self.driver = install(settings.CHROMEDRIVER_PATH)
-        else:
-            self.driver = pathDriver
-        self.options = Options()
-        self.undetectable = undetectable
-
-    def open(self):
-        '''
-        This method opens Chrome browser to start the navigation.
-        Set Custom options before using this method.
-        '''
-        if self.undetectable:
-            undetectable_install(self.driver, target_version=get_chrome_version())
-            from selenium.webdriver import Chrome
-            from selenium.webdriver.chrome.options import Options
-            self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            self.options.add_experimental_option('useAutomationExtension', False)
-        else:
-            pass
-        super().__init__(self.driver, options=self.options)
-
-    def ignoreImages(self):
-        """Disable images in browser for a better performane"""
-
-        prefs = {"profile.managed_default_content_settings.images": 2}
-        self.options.add_experimental_option("prefs", prefs)
-
-    def headless(self):
-        """Hide Browser"""
-
-        self.options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        self.options.add_experimental_option('useAutomationExtension', False)
-        self.options.add_argument("--headless")
-
-    def saveCookies(self):
-        """Save sesion cookies"""
-
-        self.options.add_argument("--user-data-dir=selenium")
-
-    def setProxy(self, proxy):
-        """Use custom proxy"""
-
-        self.options.add_argument('--proxy-server=http://%s' % proxy)
-
-    def setUserAgent(self, userAgent):
-        """Change default user agent"""
-
-        self.options.add_argument("user-agent=" + userAgent)
-
-    def setprofile(self, path):
-        """Use syste chrome profile
-        *Use this option if you are going to work with chrome plugins for example"""
-
-        self.options.add_argument("user-data-dir=" + path)  # Path to your chrome profile
-
-    def set_download_folder(self, folder):
-        self.options.add_experimental_option("prefs", {
-            "download.default_directory": f"{folder}",
-            "download.prompt_for_download": False,
-            "download.directory_upgrade": True,
-            "safebrowsing_for_trusted_sources_enabled": False,
-            "safebrowsing.enabled": False
-        })
-
-    def scrolldown(self, h=100):
-        """Scroll down to % of the current page"""
-
-        h = int(h)
-        to_height = round(self.execute_script("return document.body.scrollHeight"))
-        to_height = round((to_height * h) / 100)
-        actual_height = self.execute_script("return document.documentElement.scrollTop")
-        for i in range(actual_height, to_height, 100):
-            self.execute_script(f'window.scrollTo(0,{str(i)})')
-            time.sleep(0.1)
-
-    def enter(self, element):
-        element.send_keys(Keys.ENTER)
-
-    def element_exists(self, method, selector):
-        if method.lower() == "xpath":
-            searchBy = By.XPATH
-        elif method.lower() == "id":
-            searchBy = By.ID
-        elif method.lower() == "link_text":
-            searchBy = By.LINK_TEXT
-        elif method.lower() == "name":
-            searchBy = By.NAME
-        elif method.lower() == "tag_name":
-            searchBy = By.TAG_NAME
-        elif method.lower() == "class_name":
-            searchBy = By.CLASS_NAME
-        elif method.lower() == "css_selector":
-            searchBy = By.CSS_SELECTOR
-        else:
-            raise Exception("Method not found")
-
-        if len(self.find_elements(searchBy, selector)) > 0:
-            return True
-        else:
-            return False
 
 
 def get_chromedriver_filename():
@@ -315,7 +199,7 @@ def download_chromedriver(cwd=None):
     return chromedriver_filepath
 
 
-def install(cwd=None):
+def install_chrome(cwd=None):
     """
     Appends the directory of the chromedriver binary file to PATH.
 
@@ -347,7 +231,7 @@ class Chrome:
             kwargs['executable_path'] = './{}'.format(ChromeDriverManager(*args, **kwargs).executable_path)
         if not kwargs.get('options'):
             kwargs['options'] = ChromeOptions()
-        instance = object.__new__(_Chrome)
+        instance = object.__new__(cls)
         instance.__init__(*args, **kwargs)
         instance.execute_cdp_cmd(
             "Page.addScriptToEvaluateOnNewDocument",
@@ -387,7 +271,7 @@ class ChromeOptions:
         if not ChromeDriverManager.selenium_patched:
             ChromeDriverManager(*args, **kwargs).patch_selenium_webdriver()
 
-        instance = object.__new__(_ChromeOptions)
+        instance = object.__new__(cls)
         instance.__init__()
         instance.add_argument("start-maximized")
         instance.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -470,7 +354,7 @@ class ChromeDriverManager(object):
             if not self.target_version
             else f"LATEST_RELEASE_{self.target_version}"
         )
-        return urlopen(self.__class__.DL_BASE + path).read().decode()
+        return urllib.urlopen(self.__class__.DL_BASE + path).read().decode()
 
     def fetch_chromedriver(self):
         """
@@ -483,7 +367,7 @@ class ChromeDriverManager(object):
         ver = self.get_release_version_number()
         if os.path.exists(self.executable_path):
             return self.executable_path
-        urlretrieve(
+        urllib.urlretrieve(
             f"{self.__class__.DL_BASE}{ver}/{base_.format(f'_{self.platform}')}.zip",
             filename=zip_name,
         )
@@ -516,5 +400,159 @@ class ChromeDriverManager(object):
             return True
 
 
-def undetectable_install(executable_path=None, target_version=None, *args, **kwargs):
-    ChromeDriverManager(executable_path, target_version, *args, **kwargs).install()
+
+
+
+def get_platform_architecture_firefox():
+    if sys.platform.startswith('linux') and sys.maxsize > 2 ** 32:
+        platform = 'linux'
+        architecture = '64'
+    elif sys.platform == 'darwin':
+        platform = 'mac'
+        architecture = 'os'
+    elif sys.platform.startswith('win'):
+        platform = 'win'
+        architecture = '32'
+    else:
+        raise RuntimeError('Could not determine geckodriver download URL for this platform.')
+    return platform, architecture
+
+def get_latest_geckodriver_version():
+    """
+    :return: the latest version of geckodriver
+    """
+    url = urllib.request.urlopen('https://github.com/mozilla/geckodriver/releases/latest').geturl()
+    if '/tag/' not in url:
+        return
+    return url.split('/')[-1]
+
+
+def get_geckodriver_path():
+    """
+    :return: path of the geckodriver binary
+    """
+    return os.path.abspath(os.path.dirname(__file__))
+
+
+def print_geckodriver_path():
+    """
+    Print the path of the geckodriver binary.
+    """
+    print(get_geckodriver_path())
+
+
+def get_geckodriver_filename():
+    """
+    Returns the filename of the binary for the current platform.
+    :return: Binary filename
+    """
+    if sys.platform.startswith('win'):
+        return 'geckodriver.exe'
+    return 'geckodriver'
+
+
+def get_geckodriver_url(version):
+    """
+    Generates the download URL for current platform , architecture and the given version.
+    Supports Linux, MacOS and Windows.
+    :param version: the version of geckodriver
+    :return: Download URL for geckodriver
+    """
+    platform, architecture = get_platform_architecture_firefox()
+    return f'https://github.com/mozilla/geckodriver/releases/download/{version}' \
+           f'/geckodriver-{version}-{platform}{architecture}.tar.gz'
+
+
+def download_geckodriver(cwd=False):
+    """
+    Downloads, unzips and installs geckodriver.
+    If a geckodriver binary is found in PATH it will be copied, otherwise downloaded.
+
+    :param cwd: Flag indicating whether to download to current working directory
+    :return: The file path of geckodriver
+    """
+    firefox_version = get_firefox_version()
+    if not firefox_version:
+        logging.debug('Firefox is not installed.')
+        return
+    geckodriver_version = get_latest_geckodriver_version()
+    if not geckodriver_version:
+        logging.debug('Can not find latest version of geckodriver.')
+        return
+
+    if cwd:
+        geckodriver_dir = cwd
+    else:
+        geckodriver_dir = os.path.join(
+            os.path.abspath(os.path.dirname(__file__)),
+            geckodriver_version
+        )
+    geckodriver_filename = get_geckodriver_filename()
+    geckodriver_filepath = os.path.join(geckodriver_dir, geckodriver_filename)
+    if not os.path.isfile(geckodriver_filepath):
+        logging.debug(f'Downloading geckodriver ({geckodriver_version})...')
+        if not os.path.isdir(geckodriver_dir):
+            os.mkdir(geckodriver_dir)
+        url = get_geckodriver_url(geckodriver_version)
+        try:
+            response = urllib.request.urlopen(url)
+            if response.getcode() != 200:
+                raise urllib.error.URLError('Not Found')
+        except urllib.error.URLError:
+            raise RuntimeError(f'Failed to download geckodriver archive: {url}')
+        archive = BytesIO(response.read())
+
+        tar = tarfile.open(fileobj=archive, mode='r:gz')
+        tar.extractall(geckodriver_dir)
+        tar.close()
+    else:
+        logging.debug('geckodriver is already installed.')
+    if not os.access(geckodriver_filepath, os.X_OK):
+        os.chmod(geckodriver_filepath, 0o744)
+    return geckodriver_filepath
+
+
+def install_firefox(cwd=False):
+    """
+    Appends the directory of the geckodriver binary file to PATH.
+
+    :param cwd: Flag indicating whether to download to current working directory
+    :return: The file path of geckodriver
+    """
+    geckodriver_filepath = download_geckodriver(cwd)
+    if not geckodriver_filepath:
+        logging.debug('Can not download geckodriver.')
+        return
+    geckodriver_dir = os.path.dirname(geckodriver_filepath)
+    if 'PATH' not in os.environ:
+        os.environ['PATH'] = geckodriver_dir
+    elif geckodriver_dir not in os.environ['PATH']:
+        os.environ['PATH'] = geckodriver_dir + get_variable_separator() + os.environ['PATH']
+    return geckodriver_filepath
+
+
+def get_firefox_version():
+    """
+    :return: the version of firefox installed on client
+    """
+    platform, _ = get_platform_architecture()
+    if platform == 'linux':
+        with subprocess.Popen(['firefox', '--version'], stdout=subprocess.PIPE) as proc:
+            version = proc.stdout.read().decode('utf-8').replace('Mozilla Firefox', '').strip()
+    elif platform == 'mac':
+        process = subprocess.Popen(['/Applications/Firefox.app/Contents/MacOS/firefox', '--version'], stdout=subprocess.PIPE)
+        version = process.communicate()[0].decode('UTF-8').replace('Mozilla Firefox', '').strip()
+    elif platform == 'win':
+        path1 = 'C:\\PROGRA~1\\Mozilla Firefox\\firefox.exe'
+        path2 = 'C:\\PROGRA~2\\Mozilla Firefox\\firefox.exe'
+        if os.path.exists(path1):
+            process = subprocess.Popen([path1, '-v', '|', 'more'], stdout=subprocess.PIPE)
+        elif os.path.exists(path2):
+            process = subprocess.Popen([path2, '-v', '|', 'more'], stdout=subprocess.PIPE)
+        else:
+            return
+        version = process.communicate()[0].decode('UTF-8').replace('Mozilla Firefox', '').strip()
+    else:
+        return
+    return version
+

@@ -1,6 +1,6 @@
 from iBott import RobotFlow
+from iBott.browser_activities.firefox import FirefoxBrowser
 from iBott.robot_activities.base import Bot
-from robot.exceptions import BusinessException, SystemException
 from robot.flow import Nodes
 
 
@@ -14,6 +14,7 @@ class Robot(Bot):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.browser = None
         self.element_list = None
 
     @RobotFlow(Nodes.StartNode)
@@ -29,17 +30,16 @@ class Robot(Bot):
             3. Get the robot's data.
             4. Open Applications
         """
-
-        self.element_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        self.create_queue("transaction_data")
         self.log.trace("start Method")
-        asset = self.get_asset_by_name("Titis")
-        self.log.trace(f"Asset Name: {asset.name} | Asset Data {asset.data}")
-
-        return
+        self.element_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        self.browser = FirefoxBrowser(undetectable=True)
+        self.browser.ignore_popups()
+        self.browser.open()
+        self.browser.get("https://google.com/")
+        self.browser.save_cookies()
 
     @RobotFlow(Nodes.ConditionNode, parents=["process_data"], condition=lambda x: True if x else False)
-    def get_transaction_data(self, *args, **kwargs):
+    def get_transaction_data(self, *args):
         """
         Get transaction data method
         ===========================
@@ -54,7 +54,7 @@ class Robot(Bot):
         return element
 
     @RobotFlow(Nodes.OnTrue, parents=["get_transaction_data"])
-    def process_data(self, *args, **kwargs):
+    def process_data(self, *args):
         """
         Process data Method
         ======================

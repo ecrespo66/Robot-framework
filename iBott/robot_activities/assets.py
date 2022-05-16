@@ -1,8 +1,27 @@
 import requests
-from iBott import OrchestratorConnectionError
 
 
 class Asset(object):
+    """
+    Class to represent get assets from the robot manager console.
+    Arguments:
+        connection (object): Connection object to the robot manager console.
+        id (string): Asset ID.
+        name (string): Name of the asset.
+    Attributes:
+        connection (object): Connection object to the robot manager console.
+        id (string): Asset ID.
+        name (string): Name of the asset.
+        type (string): Type of the asset.
+        data (string): Data of the asset.
+        username (string): Username of the asset.
+        password (string): Password of the asset.
+    Methods:
+        get_assets(): Get assets all assets from the robot manager console.
+        get_asset_by_id(): Get asset by ID from the robot manager console.
+        get_asset_by_name(): Get asset by name from the robot manager console.
+
+    """
 
     def __init__(self, **kwargs):
         self.connection = kwargs['connection']
@@ -31,7 +50,7 @@ class Asset(object):
         try:
             response = requests.get(endpoint, headers=self.connection.headers)
         except Exception as exception_message:
-            raise OrchestratorConnectionError(exception_message)
+            raise Exception(exception_message)
 
         asset = response.json()
         self.id = asset['asset_id']
@@ -48,7 +67,7 @@ class Asset(object):
         try:
             response = requests.get(endpoint, headers=self.connection.headers)
         except Exception as exception_message:
-            raise OrchestratorConnectionError(exception_message)
+            raise Exception(exception_message)
 
         asset = response.json()
         self.id = asset['credential_id']

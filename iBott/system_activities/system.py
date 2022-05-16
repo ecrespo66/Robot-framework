@@ -1,6 +1,7 @@
 import os
 import string
 import random
+import sys
 import time
 
 
@@ -32,3 +33,16 @@ class System:
     def Wait(seconds=None):
         """Wait Seconds, receive number of seconds to wait"""
         time.sleep(seconds)
+
+    @staticmethod
+    def get_OS():
+        """Get current system"""
+        if sys.platform.startswith('linux') and sys.maxsize > 2 ** 32:
+            platform = 'Linux'
+        elif sys.platform == 'darwin':
+            platform = 'Mac'
+        elif sys.platform.startswith('win'):
+            platform = 'Windows'
+        else:
+            raise RuntimeError('Could not determine  Operative system.')
+        return platform

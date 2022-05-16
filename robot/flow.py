@@ -20,8 +20,6 @@ Default implementation of run:
 from enum import Enum
 from iBott.robot_activities.nodes import *
 
-
-
 class Nodes(Enum):
     StartNode = StartClass
     OperationNode = OperationClass

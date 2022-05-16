@@ -1,11 +1,14 @@
 import asyncio
+import datetime
 import json
 import os
+import string
 import warnings
 from pathlib import Path
+from random import random
+
 import requests
 import websockets
-from iBott.robot_activities.exceptions import OrchestratorConnectionError
 
 
 class OrchestratorAPI:
@@ -27,6 +30,8 @@ class OrchestratorAPI:
         self.url = self.__get_url()
         self.token = self.__get_token()
         self.headers = {'Authorization': f'Token {self.token}'}
+
+
 
     def __check_connection(self):
         """
@@ -64,7 +69,7 @@ class OrchestratorAPI:
             response = requests.post(endpoint, user_data)
             return response.json()['token']
         except:
-            raise OrchestratorConnectionError(f"Error while trying to connect to {self.url}")
+            warnings.warn(f"Error trying to connect to {self.url}")
 
     def __get_protocol(self):
         """
@@ -105,17 +110,27 @@ class OrchestratorAPI:
         Returns:
             response: dict
         """
-        await asyncio.sleep(0.01)
-        uri = f"{self.ws_protocol}{self.url}/ws/execution/{self.executionId}/"
-        message = json.dumps({"message": {"type": log_type, "data": message, "executionId": self.executionId}})
+        """
+        send log to robot manage console
+        Arguments:
+            message {string} -- message to send
+            log_type {string} -- type of the log
+        """
 
-        async with websockets.connect(uri) as websocket:
-            await websocket.send(str(message))
-            try:
-                await asyncio.wait_for(websocket.recv(), timeout=10)
-            except asyncio.TimeoutError:
-                await self.send_message(message, log_type)
-            await websocket.close()
+        endpoint = f'{self.http_protocol}{self.url}/api/logs/'
+        log_data = {
+            "LogType": log_type,
+            "LogData": message,
+            "ExecutionId": self.execution_id,
+            "LogId":  ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(64)),
+            "DateTime": datetime.datetime.now()
+        }
+        try:
+            requests.post(endpoint, log_data, headers=self.headers)
+        except Exception as e:
+            print(e)
+
+
 
     @classmethod
     def get_args(cls, args):

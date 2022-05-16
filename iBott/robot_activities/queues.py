@@ -1,15 +1,26 @@
 import requests
-from iBott import System, OrchestratorConnectionError
+from iBott import System
 from iBott.robot_activities.items import Item
-from iBott.robot_activities.server import OrchestratorAPI
 
 
 class Queue(object):
     """
-    Class to manage queues in Orchestrator.
+    Class to manage queues in the robot manager console.
     With this class you can create, update and get queues from Orchestrator.
     Arguments:
-        robot: The robot object.
+        connection: Connection object to connect to the robot manager console.
+        queue_name: Name of the queue.
+        queue_id    : ID of the queue.
+        robot_id : ID of the robot.
+    Attributes:
+        connection: Connection object to connect to the robot manager console.
+        queue_name: Name of the queue.
+        queue_id    : ID of the queue.
+        robot_id : ID of the robot.
+    Methods:
+        create_item(item_data): Create a new item in the queue.
+        get_next_item(): Get the next pending item in the queue.
+        set_retry_times(times): Set the retry times of an item.
     """
 
     def __init__(self, **kwargs):
@@ -54,7 +65,7 @@ class Queue(object):
         try:
             queue_items = requests.get(endpoint, headers=self.connection.headers).json()
         except Exception as exception_message:
-            raise OrchestratorConnectionError(exception_message)
+            raise Exception(exception_message)
 
         for qitem in queue_items:
 

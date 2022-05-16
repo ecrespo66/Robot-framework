@@ -1,14 +1,18 @@
 if not __name__ == '__main__':
-	from .excel_activities import *
-	from. browser_activities import *
-	from .word_activities import *
-	from .files_activities import*
-	from .ocr_activities import *
-	from .email_activities import *
-	from .robot_activities import *
-	from .system_activities import *
-
+	from iBott.office_activities.excels import *
+	from iBott.browser_activities.chrome import *
+	from iBott.browser_activities.firefox import *
+	from iBott.files_and_folders.files import *
+	from iBott.files_and_folders.folders import *
+	from iBott.files_and_folders.images import *
+	from iBott.files_and_folders.pdfs import *
 	from iBott.robot_activities.flow import *
 	from iBott.robot_activities.exceptions import *
+	from iBott.office_activities.words import *
+	from iBott.computer_vision.ocr_activities import *
+	from iBott.email_activities.mails import *
+
+
+
 
 
