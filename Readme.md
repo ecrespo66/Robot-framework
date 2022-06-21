@@ -121,6 +121,20 @@ class Nodes(Enum):
    CustomNode = CustomNode
 
 ```
+
+# FLOW CHART Example
+```mermaid
+flowchart LR
+0((start))
+1{get_transaction_data}
+2[process_data]
+3[[end]]
+0-->1
+1-->|True|2
+1-->|False|3
+2-->1
+```
+
 ### [3. exceptions.py](robot/exceptions.py)  
 Here you can define the actions your process must do when exceptions are raised.
 
