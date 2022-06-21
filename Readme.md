@@ -1,3 +1,21 @@
+
+# FLOW CHART Example
+```mermaid
+flowchart LR
+0((start))
+1{get_transaction_data}
+2[process_data]
+3[[end]]
+0-->1
+1-->|True|2
+1-->|False|3
+2-->1
+```
+
+
+
+
+
 # Robot Framework
 
 Robot-framework is an RPA frame written in Python, it is designed for an easy and fast development of RPA automations.
@@ -120,19 +138,6 @@ class CustomNode(RobotNode):
 class Nodes(Enum):
    CustomNode = CustomNode
 
-```
-
-# FLOW CHART Example
-```mermaid
-flowchart LR
-0((start))
-1{get_transaction_data}
-2[process_data]
-3[[end]]
-0-->1
-1-->|True|2
-1-->|False|3
-2-->1
 ```
 
 ### [3. exceptions.py](robot/exceptions.py)  
