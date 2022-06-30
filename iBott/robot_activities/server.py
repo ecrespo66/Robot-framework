@@ -6,9 +6,7 @@ import string
 import warnings
 from pathlib import Path
 from random import random
-
 import requests
-import websockets
 
 
 class OrchestratorAPI:
@@ -19,8 +17,7 @@ class OrchestratorAPI:
 
     def __init__(self, **kwargs):
         self.url = kwargs.get('url', None)
-        self.username = kwargs.get('username', None)
-        self.password = kwargs.get('password', None)
+        self.token = kwargs.get('token', None)
         self.parameters = kwargs.get('params', None)
         self.debug = False
         self.debug_data = None
@@ -28,7 +25,6 @@ class OrchestratorAPI:
         self.http_protocol = self.__get_protocol()
         self.ws_protocol = self.__get_ws_protocol()
         self.url = self.__get_url()
-        self.token = self.__get_token()
         self.headers = {'Authorization': f'Token {self.token}'}
 
     def __check_connection(self):
@@ -54,20 +50,6 @@ class OrchestratorAPI:
                 warnings.warn("No username or password provided.Please Set them in debug.json")
                 return False
         return True
-
-    def __get_token(self):
-        """
-        This method is used to get the token of iBott Ochestrator API. It is used to authenticate the user.
-        Returns:
-            token: str
-        """
-        endpoint = f"{self.http_protocol}{self.url}/api-token-auth/"
-        user_data = {'username': self.username, 'password': self.password}
-        try:
-            response = requests.post(endpoint, user_data)
-            return response.json()['token']
-        except:
-            warnings.warn(f"Error trying to connect to {self.url}")
 
     def __get_protocol(self):
         """
