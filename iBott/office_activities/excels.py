@@ -3,7 +3,6 @@ import subprocess
 import sys
 from openpyxl import load_workbook, Workbook
 from iBott.files_and_folders.files import File
-import xlwings as xw
 
 
 class Excel(File):
