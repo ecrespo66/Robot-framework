@@ -43,7 +43,7 @@ class OrchestratorAPI:
                 self.robot_id = self.debug_data['ROBOT_ID']
                 warnings.warn(f"Using debug file:{debug_file} to connect to the orchestrator, please check the variables in debug.json ")
             except:
-                warnings.warn("No username or password provided.Please Set them in debug.json")
+                warnings.warn("Incorrect Data. Please Set Robot Console Data in debug.json")
                 return False
         return True
 
