@@ -1,4 +1,3 @@
-import asyncio
 import datetime
 import json
 import os
@@ -23,7 +22,6 @@ class OrchestratorAPI:
         self.debug_data = None
         self.___connection = self.__check_connection()
         self.http_protocol = self.__get_protocol()
-        self.ws_protocol = self.__get_ws_protocol()
         self.url = self.__get_url()
         self.headers = {'Authorization': f'Token {self.token}'}
 
@@ -40,9 +38,7 @@ class OrchestratorAPI:
             try:
                 with open(debug_file, 'r') as f:
                     self.debug_data = json.load(f)
-
-                self.username = self.debug_data["IBOTT_USERNAME"]
-                self.password = self.debug_data["IBOTT_PASSWORD"]
+                self.token = self.debug_data["IBOTT_TOKEN"]
                 self.url = self.debug_data['URL']
                 self.robot_id = self.debug_data['ROBOT_ID']
                 warnings.warn(f"Using debug file:{debug_file} to connect to the orchestrator, please check the variables in debug.json ")
@@ -61,15 +57,6 @@ class OrchestratorAPI:
             return "https://"
         return "http://"
 
-    def __get_ws_protocol(self):
-        """
-        This method is used to get the websocket protocol of the iBott API.
-        Returns:
-             websocket protocol
-        """
-        if "https://" in self.url:
-            return "wss://"
-        return "ws://"
 
     def __get_url(self):
         """
