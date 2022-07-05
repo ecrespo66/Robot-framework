@@ -68,7 +68,7 @@ class Log:
         log_type = 'businessException'
         self.send(error, log_type=log_type)
 
-    async def send(self, log: str, log_type: str):
+    def send(self, log: str, log_type: str):
         """
         Async function to send logs to orchestrator
         Arguments:
@@ -79,7 +79,7 @@ class Log:
         """
         if not self.connection.debug:
             try:
-                await self.connection.send_message(log, log_type=log_type)
+                self.connection.send_message(log, log_type=log_type)
             except:
                 raise Exception("Orchestrator is not connected")
         else:
