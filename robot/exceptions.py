@@ -11,7 +11,7 @@ class BusinessException(RobotException):
         next_action:  Next action when the exception is raised.
     """
 
-    def _init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super.__init__(*args, **kwargs)
 
     def process_exception(self):
@@ -34,7 +34,7 @@ class SystemException(RobotException):
         message: Message sent to the user.
         next_action:  Next action when the exception is raised.
     """
-    def _init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super.__init__(*args, **kwargs)
 
     def process_exception(self):
