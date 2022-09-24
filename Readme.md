@@ -169,8 +169,6 @@ class BusinessException(Exception):
     This Framework is design to test the Robot Funcionality
     
 
-#Robot File Example
-
 
 # FLOW CHART
 ```mermaid
