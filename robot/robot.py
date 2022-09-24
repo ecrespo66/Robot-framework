@@ -1,7 +1,6 @@
-from iBott import RobotFlow
-from iBott.browser_activities.firefox import FirefoxBrowser
-from iBott.robot_activities.base import Bot
-from robot.flow import Nodes
+from robot_manager.base import Bot
+from robot_manager.flow import RobotFlow
+from .flow import Nodes
 
 
 class Robot(Bot):
@@ -9,13 +8,11 @@ class Robot(Bot):
     Robot class:
     ----------------
     Robot class - Inherits from Bot class.
-    ** Describe the process **
+    This Framework is design to test the Robot Funcionality
     """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.browser = None
-        self.element_list = None
 
     @RobotFlow(Nodes.StartNode)
     def start(self):
@@ -32,11 +29,12 @@ class Robot(Bot):
         """
         self.log.trace("start Method")
         self.element_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        self.browser = FirefoxBrowser(undetectable=True)
-        self.browser.ignore_popups()
-        self.browser.open()
-        self.browser.get("https://google.com/")
-        self.browser.save_cookies()
+        self.asset_testing = self.get_asset_by_id("64ILWJ77K5P1")
+        self.queue = self.create_queue("Queue_testing")
+
+        for element in self.element_list:
+            item_data = {f"element {element}": [element]}
+            self.queue.create_item(item_data)
 
     @RobotFlow(Nodes.ConditionNode, parents=["process_data"], condition=lambda x: True if x else False)
     def get_transaction_data(self, *args):
@@ -50,8 +48,8 @@ class Robot(Bot):
             2. Send the data to the next method.
         """
         self.log.trace("get_transaction_data method")
-        element = next(iter(self.element_list), None)
-        return element
+        queue_item = self.queue.get_next_item()
+        return queue_item
 
     @RobotFlow(Nodes.OnTrue, parents=["get_transaction_data"])
     def process_data(self, *args):
@@ -66,10 +64,14 @@ class Robot(Bot):
             1. Process the data.
         """
 
-        data = args[0]
-        self.log.trace(f"Start process_transaction_data Method for element: {data}")
-        self.element_list.remove(data)
-        return data
+        item = args[0]
+        self.log.trace(f"Start process_transaction_data Method for element: {str(item.data)}")
+        item.set_item_as_working()
+        item.set_item_as_fail()
+        item.set_item_as_pending()
+        item.set_item_as_ok()
+
+        return
 
     @RobotFlow(Nodes.OnFalse, parents=["get_transaction_data"])
     def end(self, *args):

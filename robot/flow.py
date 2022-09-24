@@ -1,6 +1,6 @@
 """
 You can create here your custom node clases for the flow.
-New nodes should heritate from the base class RobotNode.
+New nodes should heritage from the base class RobotNode.
 RobotNode is the base class for all robot nodes.
 To use your custom node class you must register in the enum class Nodes.
 
@@ -18,7 +18,8 @@ Default implementation of run:
 """
 
 from enum import Enum
-from iBott.robot_activities.nodes import *
+from robot_manager.nodes import *
+
 
 class Nodes(Enum):
     StartNode = StartClass

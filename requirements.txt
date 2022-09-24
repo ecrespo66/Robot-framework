@@ -1,10 +1,1 @@
-requests~=2.27.1
-imap-tools==0.16.1
-numpy
-pytesseract
-pillow
-PyPDF2
-openpyxl
-python-pptx
-pywin32
-python-docx
+ibott-robot-manager
