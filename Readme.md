@@ -1,14 +1,19 @@
 
 
-# Robot Framework
+# Robot Framework - RPA Developement Framework in Pure Python
 
 <p align="center">
-  <img src='./img/RobotFramework.webp' width=550>
+  <img src='./img/RobotFramework.webp' width=100%>
 </p>
 
 
-Robot-framework is an RPA frame written in Python, it is designed for an easy and fast development of RPA automations.
-You can connect your developments with the **robot manager console** to use cloud features or execute your process locally.
+The Robot Framework stands out as a premier open source RPA (Robotic Process Automation) software, expertly crafted in Python for streamlined 
+and efficient automation development. As a powerful RPA Python tool, it is uniquely positioned for rapid, user-friendly creation of automation scripts.
+With the Robot Framework, you unlock the potential to seamlessly integrate your automations with the robot manager console, leveraging
+advanced cloud capabilities or opting for local execution.
+This open source RPA software empowers developers to harness the full power of RPA Python, ensuring a versatile and scalable approach to automation.
+Whether your goal is to automate complex business processes or streamline mundane tasks, the Robot Framework offers a robust, flexible solution, making
+it a top choice for developers seeking efficiency and effectiveness in their RPA endeavors."
 
 
 ## Robot Files
