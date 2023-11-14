@@ -2,6 +2,10 @@
 
 # Robot Framework
 
+<p align="center">
+  <img src='./img/RobotFramework.webp' width=550>
+</p>
+
 
 Robot-framework is an RPA frame written in Python, it is designed for an easy and fast development of RPA automations.
 You can connect your developments with the **robot manager console** to use cloud features or execute your process locally.
