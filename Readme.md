@@ -20,7 +20,7 @@ The Bot Class, which is a structured template or a collection of methods and pro
 to communicate and integrate with the robot manager console. 
 This integration is crucial for the seamless operation, management, and monitoring of RPA activities.
 <p align="center">
-  <img src='./img/Robot-console.webp' width=100%>
+  <img src='./img/Robot-console.png' width=100%>
 </p>
 
 
