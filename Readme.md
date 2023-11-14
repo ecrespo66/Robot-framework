@@ -2,10 +2,10 @@
 
 # Robot Framework
 
+
 Robot-framework is an RPA frame written in Python, it is designed for an easy and fast development of RPA automations.
 You can connect your developments with the **robot manager console** to use cloud features or execute your process locally.
 
-visit https://ibott.io/Academy/robot-manager to learn more about the robot manager features.
 
 ## Robot Files
 Find the robot files in the **robot** directory.
