@@ -15,15 +15,15 @@ This open source RPA software empowers developers to harness the full power of R
 Whether your goal is to automate complex business processes or streamline mundane tasks, the Robot Framework offers a robust, flexible solution, making
 it a top choice for developers seeking efficiency and effectiveness in their RPA endeavors."
 
-# Integration with Robot Manager Console:
+## What Robot Framework can do? 
 The Bot Class, which is a structured template or a collection of methods and properties for bots, can utilize native methods
-to communicate and integrate with the robot manager console. 
+to communicate and integrate with the  **robot manager console.**
 This integration is crucial for the seamless operation, management, and monitoring of RPA activities.
 <p align="center">
   <img src='./img/Robot-console.png' width=100%>
 </p>
 
-## Assets:
+### Assets:
 Assets are typically shared variables or credentials that robots can use to perform tasks. They are essential for bots that require constant updates or access to shared resources. 
 The Bot Class would have methods that can request and retrieve these assets from the robot manager console, allowing bots to use the latest information,
 like login details or configuration settings, to execute their tasks effectively.
@@ -32,7 +32,7 @@ like login details or configuration settings, to execute their tasks effectively
 </p>
 
 
-## Queues & Items:
+### Queues & Items:
 Queues are a way to manage and distribute work items to bots. They act as a holding area for tasks that are pending execution. 
 The Bot Class would include methods to enqueue tasks or retrieve tasks from these queues. By integrating with the robot manager console, 
 bots can ensure they are processing the most current and prioritized work items, allowing for efficient task management and execution tracking.
@@ -44,7 +44,7 @@ This allows for real-time tracking of the progress and outcomes of the tasks.
   <img src='./img/Queues.png' width=100%>
 </p>
 
-##  Logs:
+###  Logs:
 Logs are records of events, operations, or transactions that bots perform. They are crucial for monitoring bot activity, auditing, and troubleshooting. 
 The Bot Class can utilize methods to send log entries to the robot manager console. These logs can then be analyzed to understand bot performance, 
 identify bottlenecks or errors, and optimize the automation processes.
@@ -52,6 +52,32 @@ identify bottlenecks or errors, and optimize the automation processes.
 <p align="center">
   <img src='./img/Logs.png' width=100%>
 </p>
+
+
+## QuickStart
+Create the new repository from a template via GitHub CLI:
+You can use the gh command to create a new repository from a template repository.
+
+```sh
+gh repo create <your-new-repo-name> --template="ecrespo66/Robot-framework"
+Replace <your-new-repo-name> with the name you want for your new repository. This command creates a new repository on GitHub based on the specified template repository.
+````
+Clone your new repository to your local machine:
+After the repository has been created on GitHub, you can clone it to your local machine to start working on it.
+
+```sh
+Copy code
+git clone https://github.com/your_username/your-new-repo-name.git
+Replace your_username with your actual GitHub username and your-new-repo-name with the name of the repository you've just created.
+```
+Navigate into your repository directory:
+Once cloned, move into your new repository's directory to begin working on it.
+
+```sh
+Copy code
+cd your-new-repo-name
+```
+
 
 ## Robot Files
 Find the robot files in the **robot** directory.
