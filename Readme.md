@@ -24,17 +24,25 @@ This integration is crucial for the seamless operation, management, and monitori
 </p>
 
 
-Assets:
-Assets are typically shared variables or credentials that robots can use to perform tasks. They are essential for bots that require constant updates or access to shared resources. The Bot Class would have methods that can request and retrieve these assets from the robot manager console, allowing bots to use the latest information, like login details or configuration settings, to execute their tasks effectively.
+## Assets:
+Assets are typically shared variables or credentials that robots can use to perform tasks. They are essential for bots that require constant updates or access to shared resources. 
+The Bot Class would have methods that can request and retrieve these assets from the robot manager console, allowing bots to use the latest information,
+like login details or configuration settings, to execute their tasks effectively.
 
-Queues:
-Queues are a way to manage and distribute work items to bots. They act as a holding area for tasks that are pending execution. The Bot Class would include methods to enqueue tasks or retrieve tasks from these queues. By integrating with the robot manager console, bots can ensure they are processing the most current and prioritized work items, allowing for efficient task management and execution tracking.
+## Queues:
+Queues are a way to manage and distribute work items to bots. They act as a holding area for tasks that are pending execution. 
+The Bot Class would include methods to enqueue tasks or retrieve tasks from these queues. By integrating with the robot manager console, 
+bots can ensure they are processing the most current and prioritized work items, allowing for efficient task management and execution tracking.
 
-Items:
-Items are individual units of work that are processed by the bots. They might contain data or instructions necessary to complete a specific task. The Bot Class would use native methods to fetch these items from the robot manager console, process them, and update their status upon completion. This allows for real-time tracking of the progress and outcomes of the tasks.
+## Items:
+Items are individual units of work that are processed by the bots. They might contain data or instructions necessary to complete a specific task. 
+The Bot Class would use native methods to fetch these items from the robot manager console, process them, and update their status upon completion. 
+This allows for real-time tracking of the progress and outcomes of the tasks.
 
-Logs:
-Logs are records of events, operations, or transactions that bots perform. They are crucial for monitoring bot activity, auditing, and troubleshooting. The Bot Class can utilize methods to send log entries to the robot manager console. These logs can then be analyzed to understand bot performance, identify bottlenecks or errors, and optimize the automation processes.
+##  Logs:
+Logs are records of events, operations, or transactions that bots perform. They are crucial for monitoring bot activity, auditing, and troubleshooting. 
+The Bot Class can utilize methods to send log entries to the robot manager console. These logs can then be analyzed to understand bot performance, 
+identify bottlenecks or errors, and optimize the automation processes.
 
 
 ## Robot Files
