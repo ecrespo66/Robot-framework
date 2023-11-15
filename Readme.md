@@ -129,17 +129,18 @@ gitGraph
     commit
     commit
 ```
-
+Replace <your-new-repo-name> with the name you want for your new repository. This command creates a new repository on GitHub based on the specified template repository.
 ```sh
 gh repo create <your-new-repo-name> --template="ecrespo66/Robot-framework"
-Replace <your-new-repo-name> with the name you want for your new repository. This command creates a new repository on GitHub based on the specified template repository.
 ````
+
 Clone your new repository to your local machine:
 After the repository has been created on GitHub, you can clone it to your local machine to start working on it.
 
+Replace your_username with your actual GitHub username and your-new-repo-name with the name of the repository you've just created.
+
 ```sh
 git clone https://github.com/your_username/your-new-repo-name.git
-Replace your_username with your actual GitHub username and your-new-repo-name with the name of the repository you've just created.
 ```
 Navigate into your repository directory:
 Once cloned, move into your new repository's directory to begin working on it.
@@ -150,7 +151,7 @@ cd your-new-repo-name
 
 
 ## Advanced Skills
-Our comprehensive Wiki is designed to equip you with a deeper understanding and advanced skills necessary for 
+Our comprehensive [Wiki](wiki.md) is designed to equip you with a deeper understanding and advanced skills necessary for 
 leveraging the full potential of our Robot Framework. Here's what you can discover:
 
 ### In-Depth Framework Customization
