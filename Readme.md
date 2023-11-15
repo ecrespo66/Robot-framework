@@ -16,9 +16,27 @@ Whether your goal is to automate complex business processes or streamline mundan
 it a top choice for developers seeking efficiency and effectiveness in their RPA endeavors."
 
 ## What Robot Framework can do? 
-The Bot Class, which is a structured template or a collection of methods and properties for bots, can utilize native methods
-to communicate and integrate with the  **robot manager console.**
-This integration is crucial for the seamless operation, management, and monitoring of RPA activities.
+### Introducing the Robot Console
+The centerpiece of the Robot Framework's suite of tools, offering a comprehensive web application to manage and schedule your automations. 
+The best part? It's completely free, democratizing access to advanced automation management for everyone.
+The Robot Console is not just another tool; it is your command center, where every aspect of your automation tasks is at your fingertips. 
+Here’s a rundown of what the Robot Console enables you to do:
+
+Connect to GitHub
+Seamlessly connect your Robot Framework projects with GitHub repositories. This integration allows you to synchronize your codebase, 
+ensuring that your automation scripts are always up-to-date with the latest changes from your development team. With just a few clicks, 
+your code on GitHub can be ready to run in your automation environment.
+
+```mermaid
+sequenceDiagram
+    Console->>+Machine: Execute this robot
+    Machine ->>+ Github: git clone robot.git
+    Github ->>+ Machine: git cloned succesfully
+    Machine -->>- Console: Send logs to console
+    
+```
+
+
 <p align="center">
   <img src='./img/Robot-console.png' width=100%>
 </p>
@@ -54,6 +72,35 @@ identify bottlenecks or errors, and optimize the automation processes.
 </p>
 
 ## Simple python design
+GPT
+If you're looking for a streamlined and powerful approach to designing automation robots in Python, the Robot Framework presents an ideal solution. 
+This framework simplifies the process of creating complex workflows, enabling both novices and seasoned developers to build robust automation tasks with ease.
+
+The beauty of the Robot Framework lies in its elegant design and its utilization of Python's decorator functionality to define flows. 
+With a simple @RobotFlow decoration, you can transform ordinary methods into components of a sophisticated automation sequence. 
+This decorator acts as an orchestrator, allowing you to seamlessly connect various tasks into a cohesive workflow, thereby encapsulating the complexity of 
+task management behind the scenes.
+
+```mermaid
+flowchart TD
+0((start))
+1{initial_check}
+2[first_condition_true]
+3[[first_condition_false]]
+4{secondary_check}
+5[second_condition_true]
+6[[second_condition_false]]
+7([end])
+0-->1
+1-->|True|2
+1-->|False|3
+2-->4
+3-->7
+4-->|True|5
+4-->|False|6
+5-->7
+6-->7
+```
 
 ## QuickStart
 Create the new repository from a template via GitHub CLI:
