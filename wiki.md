@@ -200,7 +200,7 @@ python manage.py --doc
 
 ## More Flow Examples
 
-### Nested Conditional Workflow
+### Nested Conditional Workflow Example
 
 ````python
 from robot_manager.base import Bot
@@ -251,14 +251,14 @@ class Robot(Bot):
         print("Ending nested conditional workflow")
 
 ````
-### Flow Explaination
+#### Flow Explaination
 1. StartNode (**start method**): Serves as the entry point of the workflow.
 2. ConditionNode (**initial_check method**): Evaluates a condition using a lambda function. The flow diverges based on the condition's outcome, either continuing to **first_condition_true** if true, or **first_condition_false** if false.
 3. OnTrue and OnFalse Nodes (**first_condition_true** and **first_condition_false** methods): Handle the outcomes of the initial_check. **first_condition_true** leads to another condition check (secondary_check), whereas **first_condition_false** directs the flow towards the end.
 4. Nested ConditionNode (**secondary_check method**): A second level of conditional logic, branching to either **second_condition_true** or **second_condition_false.**
 5. EndNode (**end method**):Concludes the workflow. This node is reached from various points, demonstrating multiple paths converging to a single end point.
 
-### Flow Representation
+#### Flow Representation
 ```mermaid
 flowchart TD
 0((start))
@@ -280,6 +280,71 @@ flowchart TD
 6-->7
 ```
 
+### Transactional Workflow Example
+A Transactional Workflow in Robotic Process Automation (RPA) is designed to handle a series of tasks or operations that are dependent on 
+transactional data inputs. This type of workflow is particularly relevant in scenarios where data is processed in discrete units or transactions, 
+such as in financial operations, order processing, customer service interactions, and more.
+````python
+from robot_manager.flow import RobotFlow
+from .flow import Nodes
+from robot_manager.base import Bot
+import random  # Assuming random is used for demonstration
+
+class Robot(Bot):
+    @RobotFlow(node=Nodes.StartNode)
+    def Init(self, *args):
+        print("Initializing the transactional workflow")
+
+    @RobotFlow(node=Nodes.ConditionNode, parents=["Init", "process_transaction"], condition=lambda x: x is not None)
+    def get_transaction_data(self, *args):
+        """
+        Fetches transaction data and checks if there is more data to process.
+        Returns transaction data if available, None otherwise.
+        This method is executed after 'Init' and after each 'process_transaction'.
+        """
+        # Simulation of data fetching process
+        has_data = random.choice([True, False])  # Randomly simulates data availability
+        data = "Transaction Data" if has_data else None
+        print(f"Fetching transaction data: {'Data available' if has_data else 'No data available'}")
+        return data
+
+    @RobotFlow(node=Nodes.OnTrue, parents=["get_transaction_data"])
+    def process_transaction(self, *args):
+        print("Processing transaction data")
+
+    @RobotFlow(node=Nodes.OnFalse, parents=["get_transaction_data"])
+    def end(self, *args):
+        print("No more data to process, ending the workflow")
+````
+#### Flow Explaination
+Loop Structure: The **get_transaction_data** method is repeatedly called after Init and after each **process_transaction** execution.
+It forms a loop that continues as long as there is data to process.
+Condition Evaluation: The lambda function in **get_transaction_data** checks if the returned value is not None,
+determining whether to process more transactions or end the workflow.
+
+#### Flow Representation
+```mermaid
+flowchart LR
+0((Init))
+1{get_transaction_data}
+2[process_transaction]
+3[[end]]
+0-->1
+1-->|True|2
+1-->|False|3
+2-->1
+```
+
+To gain a clearer insight into the functioning of the conditional node, let's delve into a comprehensive explanation of this node as utilized
+in the aforementioned example:
+
+````python
+@RobotFlow(node=Nodes.ConditionNode, parents=["Init", "process_transaction"], condition=lambda x: x is not None)
+````
+### Decorator Components
+1. Node Type (node=Nodes.ConditionNode): This specifies that get_transaction_data is a ConditionNode. In RPA workflows, a ConditionNode typically evaluates a certain condition to decide the next step in the process.
+2. Parents (parents=["Init", "process_transaction"]): This indicates the method's dependencies or the nodes that must be executed before it. In this case, get_transaction_data should be executed after either the Init method (which starts the workflow) or the process_transaction method (which processes a transaction). This setup creates a loop where the workflow returns to get_transaction_data after processing each transaction.
+3. Condition (condition=lambda x: x is not None):The condition for this ConditionNode is defined by a lambda function. This particular lambda checks if the input x is not None. In the context of the workflow, x represents the output from get_transaction_data. If get_transaction_data returns data (not None), the workflow proceeds to process this data. If it returns None, indicating no more data is available, the workflow moves to the end method.
 
 **BusinessException & SystemException**
 
