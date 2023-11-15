@@ -35,6 +35,10 @@ sequenceDiagram
     Machine -->>- Console: Send logs to console
     
 ```
+That's fantastic! Having access to a live test environment like the one at Robot Console is a tremendous resource for anyone interested in exploring 
+the capabilities of the Robot Framework and its management console.
+
+
 
 
 <p align="center">
