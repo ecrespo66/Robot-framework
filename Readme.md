@@ -51,8 +51,8 @@ modify the console, allowing you to tailor it to your specific needs and gain a 
 
 
 ### Detailed Logs
-Gain valuable insights with detailed logs that are generated for each robot execution. T
-hese logs are critical for debugging and provide a transparent overview of the automation's activities and performance, 
+Gain valuable insights with detailed logs that are generated for each robot execution. 
+These logs are critical for debugging and provide a transparent overview of the automation's activities and performance, 
 allowing you to quickly identify and rectify any issues.
 
 <p align="center">
