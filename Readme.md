@@ -2,10 +2,20 @@
 
 # Robot Framework - RPA Developement Framework in Pure Python
 
-<p align="center">
-  <img src='./img/RobotFramework.webp' width=100%>
-</p>
 
+```mermaid 
+gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    commit
+```
 
 The Robot Framework stands out as a premier open source RPA (Robotic Process Automation) software, expertly crafted in Python for streamlined 
 and efficient automation development. As a powerful RPA Python tool, it is uniquely positioned for rapid, user-friendly creation of automation scripts.

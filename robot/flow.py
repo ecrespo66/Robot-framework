@@ -28,3 +28,7 @@ class Nodes(Enum):
     ConditionNode = ConditionClass
     OnTrue = OnTrueClass
     OnFalse = OnFalseClass
+
+
+class Conditions(Enum):
+    has_data = lambda data: True if len(data) > 0 else False

@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 from robot_manager.flow import RobotFlow
-from robot.test_transaction import Robot
+from robot.robot import Robot
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

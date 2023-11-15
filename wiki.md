@@ -1,5 +1,5 @@
 <p align="center">
-  <img src='./img/Robot.png' width=50%>
+  <img src='./img/Robot.png' width=33%>
 </p>
 
 # Robot Framework Wiki
@@ -346,9 +346,12 @@ in the aforementioned example:
 @RobotFlow(node=Nodes.ConditionNode, parents=["Init", "process_transaction"], condition=lambda x: x is not None)
 ````
 ### Decorator Components
-1. Node Type (node=Nodes.ConditionNode): This specifies that get_transaction_data is a ConditionNode. In RPA workflows, a ConditionNode typically evaluates a certain condition to decide the next step in the process.
-2. Parents (parents=["Init", "process_transaction"]): This indicates the method's dependencies or the nodes that must be executed before it. In this case, get_transaction_data should be executed after either the Init method (which starts the workflow) or the process_transaction method (which processes a transaction). This setup creates a loop where the workflow returns to get_transaction_data after processing each transaction.
-3. Condition (condition=lambda x: x is not None):The condition for this ConditionNode is defined by a lambda function. This particular lambda checks if the input x is not None. In the context of the workflow, x represents the output from get_transaction_data. If get_transaction_data returns data (not None), the workflow proceeds to process this data. If it returns None, indicating no more data is available, the workflow moves to the end method.
+1. **Node Type** (node=Nodes.ConditionNode): This specifies that get_transaction_data is a ConditionNode. In RPA workflows, a ConditionNode typically evaluates a certain condition to decide the next step in the process.
+2. **Parents** (parents=["Init", "process_transaction"]): This indicates the method's dependencies or the nodes that must be executed before it. In this case, get_transaction_data should be executed after either the Init method (which starts the workflow) or the process_transaction method (which processes a transaction). This setup creates a loop where the workflow returns to get_transaction_data after processing each transaction.
+3. **Condition** (condition=lambda x: x is not None):The condition for this ConditionNode is defined by a lambda function. This particular lambda checks if the input x is not None. In the context of the workflow, x represents the output from get_transaction_data. If get_transaction_data returns data (not None), the workflow proceeds to process this data. If it returns None, indicating no more data is available, the workflow moves to the end method.
+
+
+
 
 **BusinessException & SystemException**
 
