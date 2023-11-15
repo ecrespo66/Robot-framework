@@ -22,7 +22,7 @@ The best part? It's completely free, democratizing access to advanced automation
 The Robot Console is not just another tool; it is your command center, where every aspect of your automation tasks is at your fingertips. 
 Here’s a rundown of what the Robot Console enables you to do:
 
-Connect to GitHub
+### Connect to GitHub
 Seamlessly connect your Robot Framework projects with GitHub repositories. This integration allows you to synchronize your codebase, 
 ensuring that your automation scripts are always up-to-date with the latest changes from your development team. With just a few clicks, 
 your code on GitHub can be ready to run in your automation environment.
@@ -35,9 +35,13 @@ sequenceDiagram
     Machine -->>- Console: Send logs to console
     
 ```
-That's fantastic! Having access to a live test environment like the one at Robot Console is a tremendous resource for anyone interested in exploring 
-the capabilities of the Robot Framework and its management console.
 
+Experience the Robot Framework in action and see firsthand how the Robot Console can revolutionize your automation workflows. You can access the tool directly using the following link: [Robot Console](https://robot-console-a73e07ff7a0d.herokuapp.com/).
+This live environment provides you with a hands-on opportunity to explore its extensive features, from creating and managing robots to monitoring their executions and managing assets, queues, and schedules.
+
+If you're interested in a more in-depth exploration or would like to customize the console, you are welcome to request permission to clone the repository. 
+Visit [robot_console](https://github.com/ecrespo66/robot_console) on GitHub to access the source code. Cloning the repository gives you the flexibility to 
+modify the console, allowing you to tailor it to your specific needs and gain a deeper understanding of its inner workings.
 
 
 
