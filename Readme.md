@@ -45,35 +45,40 @@ the capabilities of the Robot Framework and its management console.
   <img src='./img/Robot-console.png' width=100%>
 </p>
 
-### Assets:
-Assets are typically shared variables or credentials that robots can use to perform tasks. They are essential for bots that require constant updates or access to shared resources. 
-The Bot Class would have methods that can request and retrieve these assets from the robot manager console, allowing bots to use the latest information,
-like login details or configuration settings, to execute their tasks effectively.
+
+### Detailed Logs
+Gain valuable insights with detailed logs that are generated for each robot execution. T
+hese logs are critical for debugging and provide a transparent overview of the automation's activities and performance, 
+allowing you to quickly identify and rectify any issues.
+
+<p align="center">
+  <img src='./img/Logs.png' width=100%>
+</p>
+
+### Assets Management:
+Manage shared resources such as credentials, configuration files, or any data required by your robots. 
+Assets are securely stored and can be easily accessed by robots during execution, which simplifies resource management and enhances security.
 <p align="center">
   <img src='./img/Assets.png' width=100%>
 </p>
 
 
 ### Queues & Items:
-Queues are a way to manage and distribute work items to bots. They act as a holding area for tasks that are pending execution. 
-The Bot Class would include methods to enqueue tasks or retrieve tasks from these queues. By integrating with the robot manager console, 
-bots can ensure they are processing the most current and prioritized work items, allowing for efficient task management and execution tracking.
-Items are individual units of work that are processed by the bots. They might contain data or instructions necessary to complete a specific task. 
-The Bot Class would use native methods to fetch these items from the robot manager console, process them, and update their status upon completion. 
-This allows for real-time tracking of the progress and outcomes of the tasks.
+Organize and control the flow of work items using Queues. The Robot Console allows you to define queues where robots can pick up and process items in an 
+orderly fashion, ensuring that every task is accounted for and handled according to priority.
 
 <p align="center">
   <img src='./img/Queues.png' width=100%>
 </p>
 
-###  Logs:
-Logs are records of events, operations, or transactions that bots perform. They are crucial for monitoring bot activity, auditing, and troubleshooting. 
-The Bot Class can utilize methods to send log entries to the robot manager console. These logs can then be analyzed to understand bot performance, 
-identify bottlenecks or errors, and optimize the automation processes.
+### Schedules
+Take control of when your robots run with the scheduling feature. You can plan your automation tasks to run at specific intervals, manage one-off jobs, 
+or set up complex schedules to suit the demands of your business operations.
 
 <p align="center">
-  <img src='./img/Logs.png' width=100%>
+  <img src='./img/Schedules.png' width=100%>
 </p>
+
 
 ## Simple python design
 GPT
