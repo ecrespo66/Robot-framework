@@ -79,8 +79,8 @@ for debugging or development purposes, they can be set manually in the debug.jso
 
 ## Best Practices: 
 ### Using the @RobotFlow Decorator
-To optimize the functionality and maintainability of robots in the Robot Framework, 
-it is highly recommended to use the @RobotFlow decorator. This decorator plays a crucial role in defining and managing the flow of the robot.
+To optimize the functionality and maintainability of robots in the Robot Framework, it is highly recommended to use the @RobotFlow decorator. 
+This decorator plays a crucial role in defining and managing the flow of the robot.
 Here are some best practices for its usage:
 
 1. **Clear Flow Definition**: Use @RobotFlow to clearly define the sequence and logic of operations within your robot class and Enhances readability, makes the code easier to understand, and facilitates debugging and maintenance.
@@ -97,16 +97,17 @@ It's used as a decorator for methods within a robot class, enabling the definiti
 ### Key Features and Usage
 **Defining Workflow Nodes**:
 RobotFlow allows methods to be defined as nodes in a workflow. Each decorated method corresponds to a specific task or step in the process.
-The node argument in the decorator specifies the type of node to be used for executing the method. This could relate to different stages or actions in the workflow, like starting, processing, decision-making, etc.
+The node argument in the decorator specifies the type of node to be used for executing the method. 
+This could relate to different stages or actions in the workflow, like starting, processing, decision-making, etc.
 
 ### Method Tracking and Positioning
-Default Execution Order: An internal counter within the RobotFlow class is used to auto-increment and track the position of each method in the 
+**Default Execution Order**: An internal counter within the RobotFlow class is used to auto-increment and track the position of each method in the 
 workflow. This feature ensures a structured and ordered flow of the nodes. In the absence of explicitly defined parent nodes (parents parameter), 
 RobotFlow defaults to executing methods in the order in which they are defined in the class. This sequential execution is based on the position 
 assigned to each method by the internal counter. This behavior is crucial for workflows where the execution sequence is linear and does not require 
 complex branching or conditional logic.
 
-
+## Code Example
 ```python
 from robot_manager.base import Bot
 from robot_manager.flow import RobotFlow
@@ -148,30 +149,37 @@ class Robot(Bot):
         Can take additional inputs through *args.
         """
         print("Workflow ended ")
+
 ```
 
-In the RobotFlow system, each method decorated with the @RobotFlow decorator represents a node in the workflow. These nodes are interconnected and define the sequence and logic of the workflow. 
+## Code explaination
+
+In the RobotFlow system, each method decorated with the @RobotFlow decorator represents a node in the workflow. These nodes are interconnected and define the sequence and logic 
+of the workflow. 
 Here's how they relate to each other in the previous example:
 
 ### StartNode (start method)**:
-
 This is the entry point of the workflow.
 In our example, the start method is marked as a StartNode, indicating that it's the first node to be executed when the workflow begins.
 
 ### OperationNode (perform_operation method):
-
 After the StartNode, the workflow moves to the **OperationNode**.
-In the example, perform_operation is an OperationNode, which represents the main action or task in the process. This is where the core functionality of the workflow is executed.
-The sequence moves from the StartNode to the OperationNode automatically, reflecting a linear flow.
+In the example, perform_operation is an **OperationNode**, which represents the main action or task in the process. This is where the core functionality of the workflow is executed.
+The sequence moves from the **StartNode** to the **OperationNode** automatically, reflecting a linear flow.
 
 ### EndNode (end method):
 
 The workflow concludes with the **EndNode**.
 The end method in our example is marked as an **EndNode**, signifying the end of the process.
-Once the OperationNode completes its task, the flow transitions to the EndNode, marking the completion of the workflow.
+Once the OperationNode completes its task, the flow transitions to the **EndNode**, marking the completion of the workflow.
 
 
-# FLOW CHART
+## Flow Representation
+When working with complex workflows, especially in automation and process management, it's often helpful to have a visual 
+representation of the flow. This aids in understanding the sequence of operations, the relationships between different steps, 
+and the overall structure of the process. Mermaid is a tool that enables the creation of such visual representations using simple, text-based descriptions.
+Below is a Mermaid flowchart representation of the simple workflow defined in the Robot class:
+
 ```mermaid
 flowchart LR
 0((start))
@@ -181,40 +189,96 @@ flowchart LR
 1-->2
 ```
 
+### Generating Documentation with Shell Command
+To generate documentation for your workflow, including details about the methods and their relationships, you can use a command-line utility provided with your system.
+If such functionality is implemented, you might run a command like the following in your shell:
 
-
-The parents parameter (optional) allows for specifying dependencies between nodes. A method/node can be defined to execute only after the completion
-of its parent nodes.
-Conditional Execution:
-
-The condition parameter (optional) enables conditional execution of nodes. It takes a function that decides whether a node should be executed based on certain conditions.
-Node Management and Retrieval:
-
-Methods like get_nodes, get_node, and get_children are provided for retrieving nodes and their relationships within the workflow.
-order_nodes can be used to sort and organize nodes based on certain criteria.
-Methodology
-The RobotFlow decorator is applied to methods within a class representing a robotic process.
-When the decorator is invoked, it creates a node object with attributes such as the method to execute, its position in the flow, parent nodes, and the conditional function.
-These nodes are then managed collectively to define the entire workflow, with the ability to query and manipulate the flow dynamically.
-
-
-
-
-# FLOW CHART
-```mermaid
-flowchart LR
-0((start))
-1[perform_operation]
-2([end])
-0-->1
-1-->2
+```shell
+python manage.py --doc
 ```
 
-**Arguments:**
-To instance Nodes classes and register them in the flow.
-1. Nodes: Nodes class that contains the nodes of the flow read more in flow.py .
-2. parents: *optional - Defines the ancestors of the current node in the flow.
-3. condition: *optional - Defines the condition of the current node for conditional nodes.
+
+## More Flow Examples
+
+### Nested Conditional Workflow
+
+````python
+from robot_manager.base import Bot
+from robot_manager.flow import RobotFlow
+from .flow import Nodes
+
+class Robot(Bot):
+    def __init__(self, **kwargs):
+        # Initialize the base class (Bot)
+        super().__init__(**kwargs)
+
+    @RobotFlow(node=Nodes.StartNode)
+    def start(self, *args):
+        print("Starting nested conditional workflow")
+
+    @RobotFlow(node=Nodes.ConditionNode, parents=["start"], condition=lambda x: x < 5)
+    def initial_check(self, *args):
+        # The lambda function evaluates and returns a boolean value
+        condition = random.randint(0, 5)
+        print(f"First check evaluation for {condition}")
+        return condition
+
+    @RobotFlow(node=Nodes.OnTrue, parents=["initial_check"])
+    def first_condition_true(self, *args):
+        print("Initial condition met, proceeding with first true branch")
+
+    @RobotFlow(node=Nodes.OnFalse, parents=["initial_check"])
+    def first_condition_false(self, *args):
+        print("Initial Not met, proceeding with first true branch")
+
+    @RobotFlow(node=Nodes.ConditionNode, parents=["first_condition_true"], condition=lambda x: x > 5)
+    def secondary_check(self, *args):
+        # Secondary condition check with a lambda function that returns a boolean value
+        condition = random.randint(0, 10)
+        print(f"Second check evaluation for {condition}")
+        return condition
+
+    @RobotFlow(node=Nodes.OnTrue, parents=["secondary_check"])
+    def second_condition_true(self, *args):
+        print("Secondary condition met, executing specific task")
+
+    @RobotFlow(node=Nodes.OnFalse, parents=["secondary_check"])
+    def second_condition_false(self, *args):
+        print("Secondary condition not met, executing alternative task")
+
+    @RobotFlow(node=Nodes.EndNode, parents=["first_condition_false", "second_condition_false", "second_condition_true"])
+    def end(self, *args):
+        print("Ending nested conditional workflow")
+
+````
+### Flow Explaination
+1. StartNode (**start method**): Serves as the entry point of the workflow.
+2. ConditionNode (**initial_check method**): Evaluates a condition using a lambda function. The flow diverges based on the condition's outcome, either continuing to **first_condition_true** if true, or **first_condition_false** if false.
+3. OnTrue and OnFalse Nodes (**first_condition_true** and **first_condition_false** methods): Handle the outcomes of the initial_check. **first_condition_true** leads to another condition check (secondary_check), whereas **first_condition_false** directs the flow towards the end.
+4. Nested ConditionNode (**secondary_check method**): A second level of conditional logic, branching to either **second_condition_true** or **second_condition_false.**
+5. EndNode (**end method**):Concludes the workflow. This node is reached from various points, demonstrating multiple paths converging to a single end point.
+
+### Flow Representation
+```mermaid
+flowchart TD
+0((start))
+1{initial_check}
+2[first_condition_true]
+3[[first_condition_false]]
+4{secondary_check}
+5[second_condition_true]
+6[[second_condition_false]]
+7([end])
+0-->1
+1-->|True|2
+1-->|False|3
+2-->4
+3-->7
+4-->|True|5
+4-->|False|6
+5-->7
+6-->7
+```
 
 
 **BusinessException & SystemException**
