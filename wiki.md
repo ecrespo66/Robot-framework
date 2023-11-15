@@ -3,6 +3,11 @@
 
 Welcome to the Robot Framework Wiki. Here, you'll find detailed information to help you understand and utilize the advanced features of our automation framework. This document will guide you through the key components and show you how to implement and customize them for your specific needs.
 
+<p align="center">
+  <img src='./img/Robot.png' width=100%>
+</p>
+
+
 ## Dependencies
 
 The Robot Framework is dependent on the `ibott-robot-manager` package, which is essential for managing the automated tasks within the framework. To ensure the framework runs smoothly, you will need to install this package.
