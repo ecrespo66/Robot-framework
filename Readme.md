@@ -2,20 +2,10 @@
 
 # Robot Framework - RPA Developement Framework in Pure Python
 
+<p align="center">
+  <img src='./img/Robot.png' width=50%>
+</p>
 
-```mermaid 
-gitGraph
-    commit
-    commit
-    branch develop
-    checkout develop
-    commit
-    commit
-    checkout main
-    merge develop
-    commit
-    commit
-```
 
 The Robot Framework stands out as a premier open source RPA (Robotic Process Automation) software, expertly crafted in Python for streamlined 
 and efficient automation development. As a powerful RPA Python tool, it is uniquely positioned for rapid, user-friendly creation of automation scripts.
@@ -63,10 +53,24 @@ identify bottlenecks or errors, and optimize the automation processes.
   <img src='./img/Logs.png' width=100%>
 </p>
 
+## Simple python design
 
 ## QuickStart
 Create the new repository from a template via GitHub CLI:
 You can use the gh command to create a new repository from a template repository.
+```mermaid 
+gitGraph
+    commit
+    commit
+    branch develop
+    checkout develop
+    commit
+    commit
+    checkout main
+    merge develop
+    commit
+    commit
+```
 
 ```sh
 gh repo create <your-new-repo-name> --template="ecrespo66/Robot-framework"
