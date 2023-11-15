@@ -85,14 +85,12 @@ or set up complex schedules to suit the demands of your business operations.
 
 
 ## Simple python design
-GPT
 If you're looking for a streamlined and powerful approach to designing automation robots in Python, the Robot Framework presents an ideal solution. 
 This framework simplifies the process of creating complex workflows, enabling both novices and seasoned developers to build robust automation tasks with ease.
 
 The beauty of the Robot Framework lies in its elegant design and its utilization of Python's decorator functionality to define flows. 
 With a simple @RobotFlow decoration, you can transform ordinary methods into components of a sophisticated automation sequence. 
-This decorator acts as an orchestrator, allowing you to seamlessly connect various tasks into a cohesive workflow, thereby encapsulating the complexity of 
-task management behind the scenes.
+
 
 ```mermaid
 flowchart TD
