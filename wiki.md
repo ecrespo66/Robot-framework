@@ -4,7 +4,7 @@
 Welcome to the Robot Framework Wiki. Here, you'll find detailed information to help you understand and utilize the advanced features of our automation framework. This document will guide you through the key components and show you how to implement and customize them for your specific needs.
 
 <p align="center">
-  <img src='./img/Robot.png' width=100%>
+  <img src='./img/Robot.png' width=50%>
 </p>
 
 
