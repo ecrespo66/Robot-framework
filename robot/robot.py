@@ -27,14 +27,7 @@ class Robot(Bot):
             3. Get the robot's data.
             4. Open Applications
         """
-        self.log.trace("start Method")
-        self.element_list = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        self.asset_testing = self.get_asset_by_id("64ILWJ77K5P1")
-        self.queue = self.create_queue("Queue_testing")
 
-        for element in self.element_list:
-            item_data = {f"element {element}": [element]}
-            self.queue.create_item(item_data)
 
     @RobotFlow(Nodes.ConditionNode, parents=["process_data"], condition=lambda x: True if x else False)
     def get_transaction_data(self, *args):
@@ -48,8 +41,9 @@ class Robot(Bot):
             2. Send the data to the next method.
         """
         self.log.trace("get_transaction_data method")
-        queue_item = self.queue.get_next_item()
-        return queue_item
+
+
+        return
 
     @RobotFlow(Nodes.OnTrue, parents=["get_transaction_data"])
     def process_data(self, *args):
@@ -63,14 +57,7 @@ class Robot(Bot):
         Example usage:
             1. Process the data.
         """
-
-        item = args[0]
-        self.log.trace(f"Start process_transaction_data Method for element: {str(item.data)}")
-        item.set_item_as_working()
-        item.set_item_as_fail()
-        item.set_item_as_pending()
-        item.set_item_as_ok()
-
+        self.log.trace(f"Start process_transaction_data Method for element")
         return
 
     @RobotFlow(Nodes.OnFalse, parents=["get_transaction_data"])

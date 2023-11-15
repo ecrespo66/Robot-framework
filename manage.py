@@ -11,7 +11,7 @@ if __name__ == "__main__":
             process_document = f"#Robot\n{Robot.__doc__}"
             process_document = process_document + "\n" + RobotFlow.generate_documentation()
             folder = Path(os.path.dirname(os.path.realpath(__file__))).parent
-            with open(os.path.join("Readme.md"), 'w') as file:
+            with open(os.path.join("Pdd.md"), 'w') as file:
                 file.write(process_document)
                 file.close()
     else:
