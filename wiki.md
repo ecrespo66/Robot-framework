@@ -466,15 +466,38 @@ The overridden method logs the business exception and then directs the robot's f
 depending on the implementation in the process exception method.
 
 #### Exception methods
-1. retry: Retry the current node. 
-2. restart: Restart the current node. 
-3. go_to_node: Go to a specific node. 
-4. skip: Skip the current node. 
-5. stop: Stop the current flow.
+##### 1. retry
+**Functionality**: This action attempts to rerun the current node where the exception occurred.
+**Usage**: It is useful in scenarios where a transient error might have caused the exception, and a simple retry could resolve the issue.
+**Limitations**: The method includes a mechanism to limit the number of retries (max_retry_times) to prevent infinite loops.
+
+##### 2. restart
+**Functionality**: This action restarts the entire process from the first node in the flow.
+**Usage**: Particularly beneficial in cases where the process needs a complete reset due to a fundamental issue that affects the current state.
+**Limitations**: Similar to retry, it also respects a maximum number of retry attempts (max_retry_times) to avoid infinite restart loops.
+
+##### 3. go_to_node
+**Functionality**: Directs the flow to a specific node, as defined by the next_node argument.
+**Usage**: Enables dynamic redirection of the process flow, allowing for custom responses to specific exceptions.
+**Additional Context**: It takes into account the number of retries to this node and applies the same retry limit logic.
+
+
+##### 4. skip
+**Functionality**: Skips the current node and proceeds to the next one in the workflow.
+**Usage**: Ideal for bypassing a node that isn't critical to the process or can be safely ignored under certain error conditions.
+
+##### 5. stop
+**Functionality**: Halts the entire process immediately.
+**Usage**: Used in situations where continuing the process is deemed unnecessary or could lead to adverse outcomes.
+
+#### General Notes
+**Implementation**: All these actions are defined as methods in the RobotException class and are intricately linked to the workflow defined in RobotFlow.
+**Customization**: These methods provide a versatile toolkit for handling exceptions in various ways, catering to the diverse needs and complexities of different automation tasks.
+**Exception Handling**: Careful use of these actions in exception handling allows for more resilient, flexible, and maintainable robotic processes
 
 #### Example of a Process Exception Method:
 ```python
-from iBott.robot_activities.exceptions import RobotException
+from robot_manager.exceptions import RobotException
 class SystemException(RobotException):
     
     def _init__(self, *args, **kwargs):
@@ -484,11 +507,11 @@ class SystemException(RobotException):
        self.robot.Log.business_exception(self.message)
        #Process exception
        if self.next_action == "retry":
-          self.retry(3)
+          self.retry(max_retry_times=3)
        elif self.next_action == "restart":
-          self.restart(3)
+          self.restart(max_retry_times=3)
        elif self.next_action == "go_to_node":
-          self.go_to_node("end",3)
+          self.go_to_node(next_node ="end", max_retry_times=3)
        elif self.next_action == "skip":
           self.skip()
        elif self.next_action == "stop":
