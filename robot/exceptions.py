@@ -21,8 +21,21 @@ class BusinessException(RobotException):
         :param: None
         :return: None
         """
+        # send log to robot manager console.
         self.robot.Log.business_exception(self.message)
-        self.go_to_node(self.next_action, 3)
+        # Process exception
+        if self.next_action == "retry":
+            self.retry(3)
+        elif self.next_action == "restart":
+            self.restart(3)
+        elif self.next_action == "go_to_node":
+            self.go_to_node("end", 3)
+        elif self.next_action == "skip":
+            self.skip()
+        elif self.next_action == "stop":
+            self.stop()
+        else:
+            raise Exception("Invalid next_action")
 
 
 class SystemException(RobotException):
@@ -43,3 +56,18 @@ class SystemException(RobotException):
         :param: None
         :return: None"""
         self.robot.Log.system_exception(self.message)
+        # send log to robot manager console.
+        # Process exception
+        if self.next_action == "retry":
+            self.retry(3)
+        elif self.next_action == "restart":
+            self.restart(3)
+        elif self.next_action == "go_to_node":
+            self.go_to_node("end", 3)
+        elif self.next_action == "skip":
+            self.skip()
+        elif self.next_action == "stop":
+            self.stop()
+        else:
+            raise Exception("Invalid next_action")
+

@@ -1,6 +1,7 @@
 from robot_manager.base import Bot
 from robot_manager.flow import RobotFlow
-from .flow import Nodes, Conditions
+from .flow import *
+from .exceptions import *
 
 
 class Robot(Bot):
@@ -58,9 +59,8 @@ class Robot(Bot):
         Example usage:
             1. Process the data.
         """
-        #Get first available item of array
+        # Get first available item of array
         item = args[0][0]
-
 
         # TODO: Create process
 
@@ -76,8 +76,6 @@ class Robot(Bot):
         Sends output to user
         """
         self.log.trace(f"finish_process")
-        # Implementation to close browser and save Excel file
-
 
     @RobotFlow(node=Nodes.EndNode, parents=["finish_process"])
     def end(self, *args):

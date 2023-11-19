@@ -290,126 +290,189 @@ transactional data inputs. This type of workflow is particularly relevant in sce
 such as in financial operations, order processing, customer service interactions, and more.
 ````python
 from robot_manager.flow import RobotFlow
-from .flow import Nodes
+from .flow import Nodes, Conditions
 from robot_manager.base import Bot
-import random  # Assuming random is used for demonstration
 
 class Robot(Bot):
-    @RobotFlow(node=Nodes.StartNode)
-    def Init(self, *args):
-        print("Initializing the transactional workflow")
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
 
-    @RobotFlow(node=Nodes.ConditionNode, parents=["Init", "process_transaction"], condition=lambda x: x is not None)
+    @RobotFlow(node=Nodes.StartNode)
+    def init(self, *args):
+        # Transaction data example
+        self.data = [1, 2, 3, 4, 5]
+        self.log.trace("start")
+
+    @RobotFlow(node=Nodes.ConditionNode, parents=["init", "process_transaction"],condition=lambda data: True if len(data) > 0 else False)
     def get_transaction_data(self, *args):
-        """
-        Fetches transaction data and checks if there is more data to process.
-        Returns transaction data if available, None otherwise.
-        This method is executed after 'Init' and after each 'process_transaction'.
-        """
         # Simulation of data fetching process
-        has_data = random.choice([True, False])  # Randomly simulates data availability
-        data = "Transaction Data" if has_data else None
-        print(f"Fetching transaction data: {'Data available' if has_data else 'No data available'}")
-        return data
+        self.log.trace("get_transaction_data")
+        return self.data
 
     @RobotFlow(node=Nodes.OnTrue, parents=["get_transaction_data"])
     def process_transaction(self, *args):
-        print("Processing transaction data")
+        # Get first available item of array
+        item = args[0][0]
+
+        # TODO: Create process
+
+        # Remove Processed Item
+        self.data.pop(0)
+        self.log.trace(f"process_transaction_data for element {item}")
 
     @RobotFlow(node=Nodes.OnFalse, parents=["get_transaction_data"])
+    def finish_process(self, *args):
+        self.log.trace(f"finish_process")
+
+    @RobotFlow(node=Nodes.EndNode, parents=["finish_process"])
     def end(self, *args):
-        print("No more data to process, ending the workflow")
+        print("end")
 ````
 #### Flow Explaination
-Loop Structure: The **get_transaction_data** method is repeatedly called after Init and after each **process_transaction** execution.
+**Loop Structure**: The **get_transaction_data** method is repeatedly called after Init and after each **process_transaction** execution.
 It forms a loop that continues as long as there is data to process.
-Condition Evaluation: The lambda function in **get_transaction_data** checks if the returned value is not None,
+
+**Condition Evaluation**: The lambda function in **get_transaction_data** checks if the returned data is bigger than 0,
 determining whether to process more transactions or end the workflow.
 
 #### Flow Representation
 ```mermaid
 flowchart LR
-0((Init))
+0((start))
 1{get_transaction_data}
-2[process_transaction]
-3[[end]]
+2[process_data]
+3[[finish_process]]
+4([end])
 0-->1
 1-->|True|2
 1-->|False|3
 2-->1
+3-->4
 ```
 
 To gain a clearer insight into the functioning of the conditional node, let's delve into a comprehensive explanation of this node as utilized
 in the aforementioned example:
 
 ````python
-@RobotFlow(node=Nodes.ConditionNode, parents=["Init", "process_transaction"], condition=lambda x: x is not None)
+@RobotFlow(node=Nodes.ConditionNode, parents=["init","process_transaction"], condition=lambda data: True if len(data) > 0 else False)
 ````
-### Decorator Components
-1. **Node Type** (node=Nodes.ConditionNode): This specifies that get_transaction_data is a ConditionNode. In RPA workflows, a ConditionNode typically evaluates a certain condition to decide the next step in the process.
-2. **Parents** (parents=["Init", "process_transaction"]): This indicates the method's dependencies or the nodes that must be executed before it. In this case, get_transaction_data should be executed after either the Init method (which starts the workflow) or the process_transaction method (which processes a transaction). This setup creates a loop where the workflow returns to get_transaction_data after processing each transaction.
-3. **Condition** (condition=lambda x: x is not None):The condition for this ConditionNode is defined by a lambda function. This particular lambda checks if the input x is not None. In the context of the workflow, x represents the output from get_transaction_data. If get_transaction_data returns data (not None), the workflow proceeds to process this data. If it returns None, indicating no more data is available, the workflow moves to the end method.
+
+In the outlined code, the get_transaction_data method functions as a crucial conditional node within the workflow. 
+It is uniquely connected to two parent nodes: init and process_transaction. 
+This setup allows the method to be invoked either after the **init method** or following the completion of the **process_transaction** method.
+
+### Structure of the Conditional Node
+
+#### Child Nodes:
+The get_transaction_data node is designed to branch into two distinct paths, determined by its child nodes OnTrue and OnFalse.
+These paths are defined as follows:
+```python
+@RobotFlow(node=Nodes.OnTrue, parents=["get_transaction_data"]) 
+```
+For scenarios where the condition evaluates to True.
+```python  
+@RobotFlow(node=Nodes.OnFalse, parents=["get_transaction_data"])
+```
+For scenarios where the condition evaluates to False.
+
+### Condition Function:
+The direction of the workflow after get_transaction_data is determined by the specified condition function: **lambda data: True if len(data) > 0 else False**
+This lambda function assesses whether the data returned by **get_transaction_data** is bigger than 0 or not. Based on this evaluation:
+If the function returns True (i.e., data is not empty), the workflow follows the **OnTrue** path, indicating more data is available for processing.
+If the function returns False, the workflow proceeds along the **OnFalse** path, signaling the absence of further data to process.
 
 
+### Creating Custom Node Classes
+#### Inherit from RobotNode:
+Create a new class for your custom node, ensuring it inherits from the RobotNode class. 
+This inheritance is crucial as RobotNode is the base class for all robot nodes.
+#### Implement or Override Methods:
+Implement or override necessary methods, particularly the run method if you need custom behavior. 
+The default implementation of run calls the method associated with the node and passes any data to the next node in the workflow.
 
+#### Register the Custom Node:
+To make your custom node available for use, register it in the Nodes enum. 
+This registration links your custom class to an identifiable node type in the workflow.
 
-**BusinessException & SystemException**
-
-Default exception classes for the robot.
-You must define your own process_exception method in file robot/exceptions.py if you want to use them.
-1. BusinessException: Exception raised when the robot fails due to a Business error like input errors, data validation etc.
-2. SystemException: Exception raised when the robot fails due to a System error like connection errors, etc.
-
-**Arguments:**
-
-1. Robot: Robot class
-2. Message: Exception message
-3. next_action: method from robot class to be executed after the exception occurs. like retry, restart, skip, etc.
-
-
-### 2. flow.py
-
-Here You can create your custom node classes for your workflow.
-New node classes must heritage from the base class RobotNode and be registered in the enum class Nodes.
-
-**Run function:**
-
-You can also override function run for default framework nodes.
-
-**Example:**
+#### Example of a Custom Node
 
 ```python
-from iBott.robot_activities.nodes import *
 from enum import Enum
-class CustomNode(RobotNode):
-    def __init__(self,  **kwargs):
-        super().__init__(**kwargs)
-        
-    #Override default run method    
-    def run(self, robot, *args):
-        print("I'm the run funtion")
-        
-#Register custom nodes            
+from robot_manager.nodes import *
+class CustomLoggingNode(RobotNode):
+    def run(self, robot, *args, **kwargs):
+        # Custom implementation for logging
+        print("Custom logging node is running")
+        super().run(robot, *args, **kwargs)
+
 class Nodes(Enum):
-    CustomNode = CustomNode
+    # ... existing nodes ...
+    LoggingNode = CustomLoggingNode
 ```
-### 3. exceptions.py
-Here you can define the actions your process must do when exceptions are raised.
 
-**SystemException:**
-This class Heritages from *RobotException* and is used to handle exceptions caused by system errors.
+### Using Custom Conditions
+The Conditions enum allows you to define lambda functions for use as conditions in conditional nodes (ConditionNode). To add a new condition:
 
-**BusinessException:**
-This class Heritages from *RobotException* and is used to handle exceptions caused by Business errors.
+#### Define a Lambda Function:
+Write a lambda function that returns a boolean value based on your specific condition.
 
-*RobotException* class has  3 default actions to handle the exception:
-1. retry: Retry the current node.
-   1. restart: Restart the current node.
-   2. go_to_node: Go to a specific node.
-   3. skip: Skip the current node.
-   4. stop: Stop the current flow.
+#### Add to Conditions Enum:
+Register this lambda function in the Conditions enum.
 
-Example:
+```python
+class Conditions(Enum):
+    # ... existing conditions ...
+    is_even = lambda x: x % 2 == 0
+    
+```
+### Using Custom Nodes and Conditions in Your Workflow
+#### Custom Node Usage:
+```python
+@RobotFlow(node=Nodes.LoggingNode)
+def custom_logging_method(self, *args):
+    # Your implementation
+```
+
+#### Custom Condition Usage:
+
+```python
+@RobotFlow(node=Nodes.ConditionNode, condition=Conditions.is_even)
+def check_if_even(self, *args):
+    # Your implementation
+```
+
+### Exception Management
+
+The module, **exceptions.py**, provides custom exception classes for handling various types of errors that may occur during the execution 
+of a robotic process. These exceptions are specialized extensions of the RobotException class and are used to differentiate between 
+business logic errors and system-related errors.
+
+#### BusinessException
+**Inheritance**: Inherits from RobotException.
+**Purpose**: BusinessException is raised in scenarios related to business logic failures. 
+This includes situations such as input errors, data validation failures, or any other exception that is a direct result of business rule violations.
+**Process Exception Method**:This class overrides the process_exception method from RobotException. 
+The overridden method logs the business exception and then directs the robot's flow to a specified next action.
+**Actions**: The robot can handle this exception with various actions such as retry, restart, skip, or go to a specific node, 
+depending on the implementation in the process exception method.
+
+#### SystemException
+**Inheritance**: Inherits from RobotException.
+**Purpose**: SystemException is tailored to handle errors related to system operations, such as connection issues, external service failures, 
+or any hardware or software malfunctions.
+**Process Exception Method**:This class overrides the process_exception method from RobotException. 
+The overridden method logs the business exception and then directs the robot's flow to a specified next action.
+**Actions**: The robot can handle this exception with various actions such as retry, restart, skip, or go to a specific node, 
+depending on the implementation in the process exception method.
+
+#### Exception methods
+1. retry: Retry the current node. 
+2. restart: Restart the current node. 
+3. go_to_node: Go to a specific node. 
+4. skip: Skip the current node. 
+5. stop: Stop the current flow.
+
+#### Example of a Process Exception Method:
 ```python
 from iBott.robot_activities.exceptions import RobotException
 class SystemException(RobotException):
@@ -432,85 +495,25 @@ class SystemException(RobotException):
           self.stop()
        else:
           raise Exception("Invalid next_action")
-       
-       
-class BusinessException(Exception):
-   def __init__(self, *args, **kwargs):
-        super.__init__(*args, **kwargs)
-   def process_exception(self):
-     self.robot.Log.business_exception(self.message)
-     self.stop()
 ```
 
+#### Arguments for Both Exceptions
 
-#Robot
+**Robot**: An instance of the Robot class, allowing the exception to interact with the robot's workflow and logging mechanisms.
+**Message**: A descriptive message detailing the exception.
+**next_action**: Specifies the method from the Robot class to execute after the exception occurs. This could include actions like retry, restart, skip, or any custom-defined method for error handling.
 
-    Robot class:
-    ----------------
-    Robot class - Inherits from Bot class.
-    This Framework is design to test the Robot Funcionality
-    
+#### Example of exception Raise
 
-
-# FLOW CHART
-```mermaid
-flowchart LR
-0((start))
-1{get_transaction_data}
-2[process_data]
-3[[end]]
-0-->1
-1-->|True|2
-1-->|False|3
-2-->1
+```python
+from .exceptions import *
+try:
+    # Your code here
+except:
+    raise BusinessException(self, Message="Loggin fail", next_action= "retry"  )
 ```
-# FLOW NODES
-## NODE: start
- 
-        start method
-        ======================
-        Start method is the first method to be executed.
-        Use this method to execute the robot's initialization.
-        Example usage:
-            1. Initialize the robot's variables.
-            2. Clean up the environment.
-            3. Get the robot's data.
-            4. Open Applications
-        
-## NODE: get_transaction_data
- 
-        Get transaction data method
-        ===========================
-        Get transaction data method is the method that gets the data from the source.
-        Use this method to get each transactional item and send it to the next method to be processed.
-        Example usage:
-            1. Get the data from the source.
-            2. Send the data to the next method.
-        
-## NODE: process_data
- 
-        Process data Method
-        ======================
-        Process data method is the method that processes the data gathered from the previous method.
-        Use this method to process the data.
-        Arguments:
-            1. *args: Receives data from the previous method.
-        Example usage:
-            1. Process the data.
-        
-## NODE: end
- 
-        End method
-        ======================
-        End method is the last method to be executed.
-        Use this method to execute the robot's finalization.
-        Example usage:
-            1. Close the applications.
-            2. Clean up the environment.
 
-
-
-### 3.settings.py
+### settings
 Here you can define all the constants you are going to use during the process.
 
 ````python
@@ -519,8 +522,6 @@ from pathlib import Path
 """Folders to store Chrome Driver DON'T CHANGE"""
 ROBOT_FOLDER = Path(os.path.dirname(os.path.realpath(__file__))).parent
 CHROMEDRIVER_PATH = os.path.join(ROBOT_FOLDER, "Driver")
-"""Email General settings"""
-EMAIL_ACCOUNT = None
-EMAIL_PASSWORD = None
+
 ````
  
