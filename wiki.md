@@ -27,9 +27,8 @@ Alternatively, if you are setting up your environment based on specific requirem
 pip install -r requirements.txt
 ```
 
-## QuickStart
 
-### Create your first robot
+## Create your first robot
 
 Within the **robot** directory, you'll find all the necessary files that define the Robot Framework's structure and behavior.
 Bot Class in Robot Framework
@@ -59,9 +58,22 @@ class Robot(Bot):
     def end(self):
         print("I'm the last method")
 ```
+### Arguments:
 
-### Class Attributes
-#### self.parameters: 
+The Robot class is designed to establish a connection with the robot manager console and accepts a variety of arguments for this purpose:
+
+1. robotId (string): This is the unique identifier of the robot. It uniquely distinguishes one robot from another within the system.
+2. executionId (string): This represents the specific execution session ID. It is used to track and manage individual execution sessions of the robot.
+3. url (string): This is the endpoint URL used to connect with the robot manager console. It serves as the communication link between the Robot class and the console.
+4. token (string): This token corresponds to the project's folder. It is used for authentication and authorization purposes, ensuring secure access to the console.
+5. orchestrator_parameters (dictionary): These are additional parameters received from the robot manager console. They can be used to customize or configure the robot's operations according to specific needs.
+
+These arguments can be received automatically from the robot manager console during a typical operation. Alternatively, 
+for debugging or development purposes, they can be set manually in the debug.json file.
+
+
+### Class Attributes and Methods:
+#### 1. self.parameters: 
 This attribute is a dictionary containing parameters sent from the orchestrator. When a bot is executed, 
 it can receive various parameters from the robot console to be consumed during its operation. These parameters can include:
 
@@ -71,7 +83,7 @@ it can receive various parameters from the robot console to be consumed during i
 4. Files: File objects or paths. 
 These parameters allow for dynamic and flexible bot operation, tailored to the specific needs of each task.
 
-##### Handling File Parameters
+##### Handling Robot Parameters
 File Parameters in Base64 Format: When files are sent from the robot console, they are encoded in Base64 format. 
 This encoding ensures that file data is transmitted over networks in a text format, w
 hich is compatible with various system environments and network protocols.
@@ -80,11 +92,30 @@ hich is compatible with various system environments and network protocols.
 The Bot class includes a specialized function, **save_file_from_console(string, folder=None)**, 
 which efficiently handles the conversion of Base64 strings back into files. 
 This function is crucial for processing file inputs received from the robot console.
-###### Function Parameters:
+##### Function Parameters:
 **string**: The Base64 encoded string representing the file's content.
 **folder (optional)**: The destination folder where the file will be saved. If not specified, a default location is used.
 **Return Value**: This function returns the full path to the saved file, allowing the bot to access and utilize the file in its operations.
 
+#### Configure Parameters in Robot console 
+
+##### Creating a New Form: 
+During the robot setup, you need to create a new form in the robot console. 
+This form serves as the interface for inputting the parameters that the robot will receive and utilize during its operations.
+
+##### Example Form
+<p align="center">
+  <img src='./img/form.png' width=100%>
+</p>
+
+##### Defining Custom Field Names: 
+In this form, each parameter requires a unique custom field name. 
+These field names are not just identifiers but also serve as keys for the robot to retrieve and process the corresponding data. 
+It's crucial to choose descriptive and relevant field names to ensure clarity and ease of use.
+
+##### Parameter Retrieval in Robot: 
+Once the form is configured and the robot is running, it will access the inputted parameters using these custom field names. 
+The robot's code is designed to look for these specific field names to fetch and use the data accordingly.
 ##### Code Example
 ```python
 from robot_manager.base import Bot
@@ -95,31 +126,24 @@ class Robot(Bot):
         self.file = self.parameters.get('file')
         self.filepath = self.save_file_from_console(self.file)
 ````
+#### Code Explanation
+In the provided example:
 
-#### How to configure Parameters in Robot console 
-
-##### Creating a New Form: 
-During the robot setup, you need to create a new form in the robot console. 
-This form serves as the interface for inputting the parameters that the robot will receive and utilize during its operations.
-
-##### Defining Custom Field Names: 
-In this form, each parameter requires a unique custom field name. 
-These field names are not just identifiers but also serve as keys for the robot to retrieve and process the corresponding data. 
-It's crucial to choose descriptive and relevant field names to ensure clarity and ease of use.
-
-##### Parameter Retrieval in Robot: 
-Once the form is configured and the robot is running, it will access the inputted parameters using these custom field names. 
-The robot's code is designed to look for these specific field names to fetch and use the data accordingly.
-
-#### Example Form
-<p align="center">
-  <img src='./img/form.png' width=100%>
-</p>
+Robot is a new class that inherits from Bot.
+The __init__ method initializes the Robot class, with the super() function calling the initializer of the Bot class.
+This ensures that any initialization in the Bot class is also applied to Robot.
+Methods start, process, and end are defined as custom behaviors of the Robot class.
 
 
-#### Send Logs to Robot Console: 
+
+#### 2. self.log
 This attribute is an instance of the Log class, which is used to send logs to the console. 
 The Log class plays a crucial role in monitoring and debugging the bot's activities by providing different levels of logging.
+#### Log page Example: 
+<p align="center">
+  <img src='./img/Logs.png' width=100%>
+</p>
+
 ##### Log Class
 The Log class is an integral part of the Bot superclass, enabling efficient logging of the bot's activities and exceptions.
 ##### debug(log: str): 
@@ -137,43 +161,179 @@ such as connectivity or hardware failures.
 This method logs business-level exceptions, which are related to the logic and rules of the business process being 
 automated.
 
-#### Exception Handling in Log Class
-The Log class has robust exception handling, particularly in the send method. 
-If there is an issue with the connection to the orchestrator, it raises an OrchestratorConnectionError, ensuring that any connectivity problems are promptly 
+#### Code Example:
+```python
+from robot_manager.base import Bot
+
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        self.log.trace("EXAMPLE LOG")
+````
+
+If there is an issue with the connection to the orchestrator, it raises an **OrchestratorConnectionError**, ensuring that any connectivity problems are promptly 
 identified and can be addressed.
 
+#### 3. Assets
+An Asset in Robotic Process Automation (RPA) is a critical component that represents a configurable piece of information which can be used across various 
+automation tasks. These assets are managed and retrieved from the robot console to be used by your automated process.
+
+##### Set Asset in robot Console
+1. Navigate to the Assets Section
+2. Input a unique name for the asset
+3. Choose the appropriate type for the asset from the available options
+4. Depending on the selected asset type, enter the necessary data or credentials
+
+
 <p align="center">
-  <img src='./img/Logs.png' width=100%>
+  <img src='./img/Assets.png' width=100%>
 </p>
 
 
+##### Methods for Retrieving Assets
+The robot console provides two methods to facilitate the retrieval of assets, ensuring flexibility and ease of use.
+
+##### 1. get_asset_by_name(asset_name: str)
+**1. Description**: Retrieves an asset based on its name.
+**2. Parameters**: asset_name (str): The name of the asset to be retrieved.
+**3. Returns**: An instance of the Asset object.
+
+##### 2. get_asset_by_id(asset_id: str)
+**1. Description**: Retrieves an asset using its unique identifier.
+**2. Parameters**: asset_id (str): The unique identifier of the asset.
+**3. Returns**: An instance of the Asset object.
 
 
-### Explanation
-In the provided example:
+#### Asset Object
+Once an asset is retrieved using either of the above methods, it is represented as an Asset object with the following attributes:
 
-Robot is a new class that inherits from Bot.
-The __init__ method initializes the Robot class, with the super() function calling the initializer of the Bot class.
-This ensures that any initialization in the Bot class is also applied to Robot.
-Methods start, process, and end are defined as custom behaviors of the Robot class.
+1. **type:** Indicates the type of the asset. It is initially set to None and should be defined based on the asset's nature.
+2. **data:** Stores the asset's data. This attribute is used when the asset's type is not **'credential'**.
+3. **username:** Represents the username part of a credential-type asset. This is applicable only when the asset's type is 'credential'.
+4. **password:** Holds the password for a credential-type asset. Relevant only when the asset's type is 'credential'.
+
+#### Example code
+```python
+from robot_manager.base import Bot
+
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        self.login_credentials = self.get_asset_by_name("PLATFORM_LOGIN")
+        self.username = self.login_credentials.username
+        self.password = self.login_credentials.password
+```
+
+#### 3. Queues & Items
+Bot class includes three predefined methods to work with queues.
+Each of these methods interacts with the Queue Object, offering different functionalities for queue management. 
+Here's a detailed explanation of these methods, including example code to demonstrate their usage.
+
+#### find_queue_by_id(queue_id: str)
+Searches for and retrieves a queue using its unique identifier. **Returns:** Queue Object representing the queue with the specified ID.
+**Parameters:** queue_id (str): The unique identifier of the queue.
+##### Code Example:
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_id = "12345"
+        queue = self.find_queue_by_id(queue_id)
+        print(queue.queue_name)  # Displays the retrieved Queue Object
+```
+
+#### find_queues_by_name(queue_name: str)
+Retrieves one or more queues that match a given name. **Returns:** A list of Queue Objects representing the queue(s) with the specified name.
+**Parameters:** queue_name (str): The name of the queue.
+
+##### Code Example:
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_name = "ExampleQueue"
+        queues = self.find_queues_by_name(queue_name)
+        print(queues[0].queue_name)  # Displays the retrieved Queue Object
+```
+
+#### create_queue(queue_name: str)
+**1. Description**:Creates a new queue with the specified name. **Returns:** Queue Object representing the newly created queue.
+**Parameters:** queue_name (str): The name for the new queue.
+##### Code Example:
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_name = "ExampleQueue"
+        new_queue = self.create_queue(queue_name)
+        print(new_queue.queue_name)
+```
+
+#### Queue Object Overview
+The Queue object is central to managing queues in the robot manager console, allowing for the creation, update, and retrieval of queues from 
+Orchestrator. You can also create and modify queues directly within the robot console by accessing the dedicated 'Queues' section. 
+This feature allows for intuitive and streamlined management of your queue configurations, enhancing your workflow efficiency.
+
+<p align="center">
+  <img src='./img/Queues.png' width=100%>
+</p>
+
+#### Queue Object Attributes
+1. queue_name: The name of the queue. 
+2. queue_id: A unique identifier for the queue.
+3. robot_id: The identifier of the robot associated with the queue.
+
+#### Queue Object Methods
+##### create_item(item_data): 
+**1. Description**: Creates a new item in the queue. **2. Returns:** Item Object.**3. Parameters:** item_data (dictionary): data associated with the item to be created.
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_id = "12345"
+        queue = self.find_queue_by_id(queue_id)
+        item_data = {"year", "2023"}
+        queue.create_item(item_data)
+```
 
 
-### Arguments:
+##### get_next_item():
+**1. Description**: Retrieves the next pending item from the queue. **2. Returns**: Item Object.
 
-The Robot class is designed to establish a connection with the robot manager console and accepts a variety of arguments for this purpose:
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_id = "12345"
+        queue = self.find_queue_by_id(queue_id)
+        item = queue.get_next_item()
+        print(item.item_data)
+```
 
-1. robotId (string): This is the unique identifier of the robot. It uniquely distinguishes one robot from another within the system.
-2. executionId (string): This represents the specific execution session ID. It is used to track and manage individual execution sessions of the robot.
-3. url (string): This is the endpoint URL used to connect with the robot manager console. It serves as the communication link between the Robot class and the console.
-4. token (string): This token corresponds to the project's folder. It is used for authentication and authorization purposes, ensuring secure access to the console.
-5. orchestrator_parameters (dictionary): These are additional parameters received from the robot manager console. They can be used to customize or configure the robot's operations according to specific needs.
+##### set_retry_times(times):
+**1. Description**: Sets the number of retry attempts for the items in the queue.**Parameters**: times: The number of retry attempts.
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_id = "12345"
+        queue = self.find_queue_by_id(queue_id)
+        queue.set_retry_times(3)
+```
 
-These arguments can be received automatically from the robot manager console during a typical operation. Alternatively, 
-for debugging or development purposes, they can be set manually in the debug.json file.
-
-
-## Best Practices: 
-### Using the @RobotFlow Decorator
+### Design your flow using the @RobotFlow Decorator
 To optimize the functionality and maintainability of robots in the Robot Framework, it is highly recommended to use the @RobotFlow decorator. 
 This decorator plays a crucial role in defining and managing the flow of the robot.
 Here are some best practices for its usage:
