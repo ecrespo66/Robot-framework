@@ -150,18 +150,18 @@ The Log class plays a crucial role in monitoring and debugging the bot's activit
 
 #### Log Class
 The Log class is an integral part of the Bot superclass, enabling efficient logging of the bot's activities and exceptions.
-#### debug(log: str): 
+#### 1. debug(log: str): 
 This method sends a debug log to the robot manager console. It is used for detailed diagnostic information, 
 typically of interest only when diagnosing problems. 
-#### trace(log: str): 
+#### 2. trace(log: str): 
 This method sends a trace log, which is used for general tracing of the application flow.
-#### log(log: str): 
+#### 3. log(log: str): 
 This method sends an info log to the console. It is used for general informational messages that highlight the progress of the 
 application at coarse-grained level.
-#### system_exception(error: str): 
+#### 4. system_exception(error: str): 
 This method is used to log system-level exceptions, indicating issues in the system's functioning, 
 such as connectivity or hardware failures.
-#### business_exception(error: str): 
+#### 5. business_exception(error: str): 
 This method logs business-level exceptions, which are related to the logic and rules of the business process being 
 automated.
 
