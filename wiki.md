@@ -83,12 +83,12 @@ it can receive various parameters from the robot console to be consumed during i
 4. Files: File objects or paths. 
 These parameters allow for dynamic and flexible bot operation, tailored to the specific needs of each task.
 
-##### Handling Robot Parameters
+#### Handling Robot Parameters
 File Parameters in Base64 Format: When files are sent from the robot console, they are encoded in Base64 format. 
 This encoding ensures that file data is transmitted over networks in a text format, w
 hich is compatible with various system environments and network protocols.
 
-##### Conversion of Base64 Strings to Files: 
+#### Conversion of Base64 Strings to Files: 
 The Bot class includes a specialized function, **save_file_from_console(string, folder=None)**, 
 which efficiently handles the conversion of Base64 strings back into files. 
 This function is crucial for processing file inputs received from the robot console.
@@ -99,21 +99,21 @@ This function is crucial for processing file inputs received from the robot cons
 
 #### Configure Parameters in Robot console 
 
-##### Creating a New Form: 
+#### Creating a New Form: 
 During the robot setup, you need to create a new form in the robot console. 
 This form serves as the interface for inputting the parameters that the robot will receive and utilize during its operations.
 
-##### Example Form
+#### Example Form
 <p align="center">
   <img src='./img/form.png' width=100%>
 </p>
 
-##### Defining Custom Field Names: 
+#### Defining Custom Field Names: 
 In this form, each parameter requires a unique custom field name. 
 These field names are not just identifiers but also serve as keys for the robot to retrieve and process the corresponding data. 
 It's crucial to choose descriptive and relevant field names to ensure clarity and ease of use.
 
-##### Parameter Retrieval in Robot: 
+#### Parameter Retrieval in Robot: 
 Once the form is configured and the robot is running, it will access the inputted parameters using these custom field names. 
 The robot's code is designed to look for these specific field names to fetch and use the data accordingly.
 ##### Code Example
@@ -144,20 +144,20 @@ The Log class plays a crucial role in monitoring and debugging the bot's activit
   <img src='./img/Logs.png' width=100%>
 </p>
 
-##### Log Class
+#### Log Class
 The Log class is an integral part of the Bot superclass, enabling efficient logging of the bot's activities and exceptions.
-##### debug(log: str): 
+#### debug(log: str): 
 This method sends a debug log to the robot manager console. It is used for detailed diagnostic information, 
 typically of interest only when diagnosing problems. 
-##### trace(log: str): 
+#### trace(log: str): 
 This method sends a trace log, which is used for general tracing of the application flow.
-##### log(log: str): 
+#### log(log: str): 
 This method sends an info log to the console. It is used for general informational messages that highlight the progress of the 
 application at coarse-grained level.
-##### system_exception(error: str): 
+#### system_exception(error: str): 
 This method is used to log system-level exceptions, indicating issues in the system's functioning, 
 such as connectivity or hardware failures.
-##### business_exception(error: str): 
+#### business_exception(error: str): 
 This method logs business-level exceptions, which are related to the logic and rules of the business process being 
 automated.
 
@@ -178,7 +178,7 @@ identified and can be addressed.
 An Asset in Robotic Process Automation (RPA) is a critical component that represents a configurable piece of information which can be used across various 
 automation tasks. These assets are managed and retrieved from the robot console to be used by your automated process.
 
-##### Set Asset in robot Console
+#### Set Asset in robot Console
 1. Navigate to the Assets Section
 2. Input a unique name for the asset
 3. Choose the appropriate type for the asset from the available options
@@ -190,15 +190,15 @@ automation tasks. These assets are managed and retrieved from the robot console 
 </p>
 
 
-##### Methods for Retrieving Assets
+#### Methods for Retrieving Assets
 The robot console provides two methods to facilitate the retrieval of assets, ensuring flexibility and ease of use.
 
-##### 1. get_asset_by_name(asset_name: str)
+#### 1. get_asset_by_name(asset_name: str)
 **1. Description**: Retrieves an asset based on its name.
 **2. Parameters**: asset_name (str): The name of the asset to be retrieved.
 **3. Returns**: An instance of the Asset object.
 
-##### 2. get_asset_by_id(asset_id: str)
+#### 2. get_asset_by_id(asset_id: str)
 **1. Description**: Retrieves an asset using its unique identifier.
 **2. Parameters**: asset_id (str): The unique identifier of the asset.
 **3. Returns**: An instance of the Asset object.
