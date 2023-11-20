@@ -198,12 +198,12 @@ automation tasks. These assets are managed and retrieved from the robot console 
 The robot console provides two methods to facilitate the retrieval of assets, ensuring flexibility and ease of use.
 
 #### 1. get_asset_by_name(asset_name: str)
-**Description**: Retrieves an asset based on its name.
+Retrieves an asset based on its name.
 **Parameters**: asset_name (str): The name of the asset to be retrieved.
 **Returns**: An instance of the Asset object.
 
 #### 2. get_asset_by_id(asset_id: str)
-**Description**: Retrieves an asset using its unique identifier.
+Retrieves an asset using its unique identifier.
 **Parameters**: asset_id (str): The unique identifier of the asset.
 **Returns**: An instance of the Asset object.
 
@@ -265,7 +265,7 @@ class Robot(Bot):
 ```
 
 #### 3. create_queue(queue_name: str)
-**Description**:Creates a new queue with the specified name. **Returns:** Queue Object representing the newly created queue.
+Creates a new queue with the specified name. **Returns:** Queue Object representing the newly created queue.
 **Parameters:** queue_name (str): The name for the new queue.
 
 ##### Code Example:
@@ -299,7 +299,7 @@ This feature allows for intuitive and streamlined management of your queue confi
 The robot console provides two methods to facilitate the retrieval of Queues, ensuring flexibility and ease of use.
 
 #### 1. create_item(item_data: dict): 
-**Description**: Creates a new item in the queue. **Returns:** Item Object.**Parameters:** item_data (dictionary): data associated with the item to be created.
+Creates a new item in the queue. **Returns:** Item Object.**Parameters:** item_data (dictionary): data associated with the item to be created.
 ```python
 from robot_manager.base import Bot
 from robot_manager.queues import Queue
@@ -313,7 +313,7 @@ class Robot(Bot):
 ```
 
 #### 2. get_next_item():
-**Description**: Retrieves the next pending item from the queue. **Returns**: Item Object.
+Retrieves the next pending item from the queue. **Returns**: Item Object.
 
 ```python
 from robot_manager.base import Bot
@@ -328,7 +328,7 @@ class Robot(Bot):
 ```
 
 #### 3. set_retry_times(times: int):
-**Description**: Sets the number of retry attempts for the items in the queue.**Parameters**: times: The number of retry attempts.
+Sets the number of retry attempts for the items in the queue.**Parameters**: times: The number of retry attempts.
 ```python
 from robot_manager.base import Bot
 from robot_manager.queues import Queue
