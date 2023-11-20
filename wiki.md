@@ -135,7 +135,6 @@ This ensures that any initialization in the Bot class is also applied to Robot.
 Methods start, process, and end are defined as custom behaviors of the Robot class.
 
 
-
 #### 2. self.log
 This attribute is an instance of the Log class, which is used to send logs to the console. 
 The Log class plays a crucial role in monitoring and debugging the bot's activities by providing different levels of logging.
@@ -263,6 +262,7 @@ class Robot(Bot):
 #### create_queue(queue_name: str)
 **1. Description**:Creates a new queue with the specified name. **Returns:** Queue Object representing the newly created queue.
 **Parameters:** queue_name (str): The name for the new queue.
+
 ##### Code Example:
 ```python
 from robot_manager.base import Bot
@@ -290,7 +290,8 @@ This feature allows for intuitive and streamlined management of your queue confi
 3. robot_id: The identifier of the robot associated with the queue.
 
 #### Queue Object Methods
-##### create_item(item_data): 
+
+#### create_item(item_data): 
 **1. Description**: Creates a new item in the queue. **2. Returns:** Item Object.**3. Parameters:** item_data (dictionary): data associated with the item to be created.
 ```python
 from robot_manager.base import Bot
@@ -304,8 +305,7 @@ class Robot(Bot):
         queue.create_item(item_data)
 ```
 
-
-##### get_next_item():
+#### get_next_item():
 **1. Description**: Retrieves the next pending item from the queue. **2. Returns**: Item Object.
 
 ```python
@@ -320,7 +320,7 @@ class Robot(Bot):
         print(item.item_data)
 ```
 
-##### set_retry_times(times):
+#### set_retry_times(times):
 **1. Description**: Sets the number of retry attempts for the items in the queue.**Parameters**: times: The number of retry attempts.
 ```python
 from robot_manager.base import Bot
@@ -332,6 +332,39 @@ class Robot(Bot):
         queue = self.find_queue_by_id(queue_id)
         queue.set_retry_times(3)
 ```
+
+#### Item Object Overview
+The Item Object is a fundamental component within the robot manager console, specifically designed for managing individual items within queues.
+You can also create and modify queues directly within the robot console by accessing the dedicated 'Item' section. 
+This feature allows for intuitive and streamlined management of your item data.
+In the Robot's code, this object encapsulates various attributes and methods that allow for detailed tracking and manipulation of items, 
+which are the individual units of work or tasks processed by the automated system.
+
+<p align="center">
+  <img src='./img/Item.png' width=100%>
+</p>
+
+
+#### Item Object Attributes
+1. start_date (str): The start date for retrieving items.
+2. end_date (str): The end date for retrieving items.
+3. item_id (int): A unique identifier for the item.
+4. item_data (dict): Data associated with the item.
+5. item_executions (int): The number of times the item has been executed.
+6. value (str): The value of the item.
+7. status (str): The current status of the item (e.g., working, failed, pending).
+
+#### Item Object Methods
+#### set_item_as_working():
+Marks the item as currently being processed.
+#### set_item_as_ok():
+Marks the item as successfully processed.
+#### set_item_as_fail():
+Marks the item as failed in processing.
+#### set_item_as_pending():
+Resets the item status to pending, indicating it is not yet processed.
+#### set_item_executions():
+Increments the execution counter for the item, tracking how many times it has been processed.
 
 ### Design your flow using the @RobotFlow Decorator
 To optimize the functionality and maintainability of robots in the Robot Framework, it is highly recommended to use the @RobotFlow decorator. 
