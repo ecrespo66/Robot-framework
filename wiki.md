@@ -74,8 +74,8 @@ The Robot class is designed to establish a connection with the robot manager con
 These arguments can be received automatically from the robot manager console during a typical operation. Alternatively, 
 for debugging or development purposes, they can be set manually in the debug.json file.
 
-### Bot Attributes and Methods:
-#### 1. Robot Parameters: 
+## Bot Attributes and Methods:
+### 1. Robot Parameters: 
 This attribute is a dictionary containing parameters sent from the orchestrator. When a bot is executed, 
 it can receive various parameters from the robot console to be consumed during its operation. These parameters can include:
 
@@ -100,7 +100,7 @@ This function is crucial for processing file inputs received from the robot cons
 2. **folder (optional)**: The destination folder where the file will be saved. If not specified, a default location is used.
 3. **Return Value**: This function returns the full path to the saved file, allowing the bot to access and utilize the file in its operations.
 
-#### Configure Parameters in Robot console 
+### Configure Parameters in Robot console 
 
 #### Creating a New Form: 
 During the robot setup, you need to create a new form in the robot console. 
@@ -139,7 +139,7 @@ This ensures that any initialization in the Bot class is also applied to Robot.
 Methods start, process, and end are defined as custom behaviors of the Robot class.
 
 
-#### 2. Logs
+### 2. Logs
 This attribute is an instance of the Log class, which is used to send logs to the console. 
 The Log class plays a crucial role in monitoring and debugging the bot's activities by providing different levels of logging.
 
@@ -178,7 +178,7 @@ class Robot(Bot):
 If there is an issue with the connection to the orchestrator, it raises an **OrchestratorConnectionError**, ensuring that any connectivity problems are promptly 
 identified and can be addressed.
 
-#### 3. Assets
+### 3. Assets
 An Asset in Robotic Process Automation (RPA) is a critical component that represents a configurable piece of information which can be used across various 
 automation tasks. These assets are managed and retrieved from the robot console to be used by your automated process.
 
@@ -207,7 +207,7 @@ The robot console provides two methods to facilitate the retrieval of assets, en
 **Parameters**: asset_id (str): The unique identifier of the asset.
 **Returns**: An instance of the Asset object.
 
-#### Asset Object
+### Asset Object
 Once an asset is retrieved using either of the above methods, it is represented as an Asset object with the following attributes:
 
 1. **type:** Indicates the type of the asset. It is initially set to None and should be defined based on the asset's nature.
@@ -227,7 +227,7 @@ class Robot(Bot):
         self.password = self.login_credentials.password
 ```
 
-#### 3. Queues & Items
+### 3. Queues & Items
 Bot class includes three predefined methods to work with queues.
 Each of these methods interacts with the Queue Object, offering different functionalities for queue management. 
 Here's a detailed explanation of these methods, including example code to demonstrate their usage.
