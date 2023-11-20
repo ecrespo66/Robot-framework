@@ -767,27 +767,27 @@ The overridden method logs the business exception and then directs the robot's f
 depending on the implementation in the process exception method.
 
 #### Exception methods
-##### 1. retry
+#### 1. retry(max_retry_times)
 **Functionality**: This action attempts to rerun the current node where the exception occurred.
 **Usage**: It is useful in scenarios where a transient error might have caused the exception, and a simple retry could resolve the issue.
 **Limitations**: The method includes a mechanism to limit the number of retries (max_retry_times) to prevent infinite loops.
 
-##### 2. restart
+#### 2. restart(max_retry_times)
 **Functionality**: This action restarts the entire process from the first node in the flow.
 **Usage**: Particularly beneficial in cases where the process needs a complete reset due to a fundamental issue that affects the current state.
 **Limitations**: Similar to retry, it also respects a maximum number of retry attempts (max_retry_times) to avoid infinite restart loops.
 
-##### 3. go_to_node
+#### 3. go_to_node(next_node, max_retry_times)
 **Functionality**: Directs the flow to a specific node, as defined by the next_node argument.
 **Usage**: Enables dynamic redirection of the process flow, allowing for custom responses to specific exceptions.
 **Additional Context**: It takes into account the number of retries to this node and applies the same retry limit logic.
 
 
-##### 4. skip
+#### 4. skip()
 **Functionality**: Skips the current node and proceeds to the next one in the workflow.
 **Usage**: Ideal for bypassing a node that isn't critical to the process or can be safely ignored under certain error conditions.
 
-##### 5. stop
+#### 5. stop()
 **Functionality**: Halts the entire process immediately.
 **Usage**: Used in situations where continuing the process is deemed unnecessary or could lead to adverse outcomes.
 
@@ -823,29 +823,19 @@ class SystemException(RobotException):
 
 #### Arguments for Both Exceptions
 
-**Robot**: An instance of the Robot class, allowing the exception to interact with the robot's workflow and logging mechanisms.
-**Message**: A descriptive message detailing the exception.
-**next_action**: Specifies the method from the Robot class to execute after the exception occurs. This could include actions like retry, restart, skip, or any custom-defined method for error handling.
+1. **Robot**: An instance of the Robot class, allowing the exception to interact with the robot's workflow and logging mechanisms.
+2. **Message**: A descriptive message detailing the exception.
+3. **next_action**: Specifies the method from the Robot class to execute after the exception occurs. This could include actions like retry, restart, skip, or any custom-defined method for error handling.
 
 #### Example of exception Raise
 
 ```python
-from .exceptions import *
+from .exceptions import BusinessException
 try:
     # Your code here
 except:
     raise BusinessException(self, Message="Loggin fail", next_action= "retry"  )
 ```
 
-### settings
-Here you can define all the constants you are going to use during the process.
 
-````python
-import os
-from pathlib import Path
-"""Folders to store Chrome Driver DON'T CHANGE"""
-ROBOT_FOLDER = Path(os.path.dirname(os.path.realpath(__file__))).parent
-CHROMEDRIVER_PATH = os.path.join(ROBOT_FOLDER, "Driver")
-
-````
  
