@@ -232,7 +232,7 @@ Bot class includes three predefined methods to work with queues.
 Each of these methods interacts with the Queue Object, offering different functionalities for queue management. 
 Here's a detailed explanation of these methods, including example code to demonstrate their usage.
 
-#### find_queue_by_id(queue_id: str)
+#### 1. find_queue_by_id(queue_id: str)
 Searches for and retrieves a queue using its unique identifier. **Returns:** Queue Object representing the queue with the specified ID.
 **Parameters:** queue_id (str): The unique identifier of the queue.
 
@@ -248,7 +248,7 @@ class Robot(Bot):
         print(queue.queue_name)  # Displays the retrieved Queue Object
 ```
 
-#### find_queues_by_name(queue_name: str)
+#### 2. find_queues_by_name(queue_name: str)
 Retrieves one or more queues that match a given name. **Returns:** A list of Queue Objects representing the queue(s) with the specified name.
 **Parameters:** queue_name (str): The name of the queue.
 
@@ -264,8 +264,8 @@ class Robot(Bot):
         print(queues[0].queue_name)  # Displays the retrieved Queue Object
 ```
 
-#### create_queue(queue_name: str)
-**1. Description**:Creates a new queue with the specified name. **Returns:** Queue Object representing the newly created queue.
+#### 3. create_queue(queue_name: str)
+**Description**:Creates a new queue with the specified name. **Returns:** Queue Object representing the newly created queue.
 **Parameters:** queue_name (str): The name for the new queue.
 
 ##### Code Example:
@@ -295,8 +295,10 @@ This feature allows for intuitive and streamlined management of your queue confi
 3. robot_id: The identifier of the robot associated with the queue.
 
 #### Queue Object Methods
+##### Methods for Retrieving Assets
+The robot console provides two methods to facilitate the retrieval of Queues, ensuring flexibility and ease of use.
 
-#### create_item(item_data): 
+#### 1. create_item(item_data): 
 **Description**: Creates a new item in the queue. **Returns:** Item Object.**Parameters:** item_data (dictionary): data associated with the item to be created.
 ```python
 from robot_manager.base import Bot
@@ -310,7 +312,7 @@ class Robot(Bot):
         queue.create_item(item_data)
 ```
 
-#### get_next_item():
+#### 2. get_next_item():
 **Description**: Retrieves the next pending item from the queue. **Returns**: Item Object.
 
 ```python
@@ -325,7 +327,7 @@ class Robot(Bot):
         print(item.item_data)
 ```
 
-#### set_retry_times(times):
+#### 3. set_retry_times(times):
 **Description**: Sets the number of retry attempts for the items in the queue.**Parameters**: times: The number of retry attempts.
 ```python
 from robot_manager.base import Bot
