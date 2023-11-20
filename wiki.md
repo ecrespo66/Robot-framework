@@ -298,7 +298,7 @@ This feature allows for intuitive and streamlined management of your queue confi
 ##### Methods for Retrieving Assets
 The robot console provides two methods to facilitate the retrieval of Queues, ensuring flexibility and ease of use.
 
-#### 1. create_item(item_data): 
+#### 1. create_item(item_data: dict): 
 **Description**: Creates a new item in the queue. **Returns:** Item Object.**Parameters:** item_data (dictionary): data associated with the item to be created.
 ```python
 from robot_manager.base import Bot
@@ -327,7 +327,7 @@ class Robot(Bot):
         print(item.item_data)
 ```
 
-#### 3. set_retry_times(times):
+#### 3. set_retry_times(times: int):
 **Description**: Sets the number of retry attempts for the items in the queue.**Parameters**: times: The number of retry attempts.
 ```python
 from robot_manager.base import Bot
