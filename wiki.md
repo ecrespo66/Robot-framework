@@ -757,7 +757,7 @@ The overridden method logs the business exception and then directs the robot's f
 **Actions**: The robot can handle this exception with various actions such as retry, restart, skip, or go to a specific node, 
 depending on the implementation in the process exception method.
 
-#### SystemException
+### SystemException
 **Inheritance**: Inherits from RobotException.
 **Purpose**: SystemException is tailored to handle errors related to system operations, such as connection issues, external service failures, 
 or any hardware or software malfunctions.
@@ -766,7 +766,7 @@ The overridden method logs the business exception and then directs the robot's f
 **Actions**: The robot can handle this exception with various actions such as retry, restart, skip, or go to a specific node, 
 depending on the implementation in the process exception method.
 
-#### Exception methods
+### Exception methods
 #### 1. retry(max_retry_times)
 **Functionality**: This action attempts to rerun the current node where the exception occurred.
 **Usage**: It is useful in scenarios where a transient error might have caused the exception, and a simple retry could resolve the issue.
