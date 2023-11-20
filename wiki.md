@@ -280,7 +280,7 @@ class Robot(Bot):
         print(new_queue.queue_name)
 ```
 
-#### Queue Object Overview
+### Queue Object 
 The Queue object is central to managing queues in the robot manager console, allowing for the creation, update, and retrieval of queues from 
 Orchestrator. You can also create and modify queues directly within the robot console by accessing the dedicated 'Queues' section. 
 This feature allows for intuitive and streamlined management of your queue configurations, enhancing your workflow efficiency.
@@ -340,7 +340,7 @@ class Robot(Bot):
         queue.set_retry_times(3)
 ```
 
-#### Item Object Overview
+### Item Object 
 The Item Object is a fundamental component within the robot manager console, specifically designed for managing individual items within queues.
 You can also create and modify queues directly within the robot console by accessing the dedicated 'Item' section. 
 This feature allows for intuitive and streamlined management of your item data.
