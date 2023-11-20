@@ -92,10 +92,11 @@ hich is compatible with various system environments and network protocols.
 The Bot class includes a specialized function, **save_file_from_console(string, folder=None)**, 
 which efficiently handles the conversion of Base64 strings back into files. 
 This function is crucial for processing file inputs received from the robot console.
-##### Function Parameters:
-**string**: The Base64 encoded string representing the file's content.
-**folder (optional)**: The destination folder where the file will be saved. If not specified, a default location is used.
-**Return Value**: This function returns the full path to the saved file, allowing the bot to access and utilize the file in its operations.
+
+#### Function Parameters:
+1. **string**: The Base64 encoded string representing the file's content.
+2. **folder (optional)**: The destination folder where the file will be saved. If not specified, a default location is used.
+3. **Return Value**: This function returns the full path to the saved file, allowing the bot to access and utilize the file in its operations.
 
 #### Configure Parameters in Robot console 
 
