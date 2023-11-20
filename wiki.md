@@ -148,7 +148,7 @@ The Log class plays a crucial role in monitoring and debugging the bot's activit
   <img src='./img/Logs.png' width=100%>
 </p>
 
-#### Log Class
+### Log Class
 The Log class is an integral part of the Bot superclass, enabling efficient logging of the bot's activities and exceptions.
 #### 1. debug(log: str): 
 This method sends a debug log to the robot manager console. It is used for detailed diagnostic information, 
