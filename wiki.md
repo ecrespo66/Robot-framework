@@ -290,9 +290,9 @@ This feature allows for intuitive and streamlined management of your queue confi
 </p>
 
 #### Queue Object Attributes
-1. queue_name: The name of the queue. 
-2. queue_id: A unique identifier for the queue.
-3. robot_id: The identifier of the robot associated with the queue.
+1. **queue_name**: The name of the queue. 
+2. **queue_id**: A unique identifier for the queue.
+3. **robot_id**: The identifier of the robot associated with the queue.
 
 #### Queue Object Methods
 ##### Methods for Retrieving Assets
