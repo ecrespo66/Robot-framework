@@ -791,7 +791,7 @@ depending on the implementation in the process exception method.
 **Functionality**: Halts the entire process immediately.
 **Usage**: Used in situations where continuing the process is deemed unnecessary or could lead to adverse outcomes.
 
-#### General Notes
+### General Notes
 **Implementation**: All these actions are defined as methods in the RobotException class and are intricately linked to the workflow defined in RobotFlow.
 **Customization**: These methods provide a versatile toolkit for handling exceptions in various ways, catering to the diverse needs and complexities of different automation tasks.
 **Exception Handling**: Careful use of these actions in exception handling allows for more resilient, flexible, and maintainable robotic processes
