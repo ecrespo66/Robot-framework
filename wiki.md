@@ -29,17 +29,20 @@ pip install -r requirements.txt
 
 
 ## Create your first robot
-
 Within the **robot** directory, you'll find all the necessary files that define the Robot Framework's structure and behavior.
 Bot Class in Robot Framework
-The Bot class is a fundamental part of the Robot Framework, designed to serve as a base class for creating various types of robotic functionalities. Below is a detailed explanation of how to use the Bot class, along with a specific example.
+The Bot class is a fundamental part of the Robot Framework, designed to serve as a base class for creating various types of robotic functionalities. 
+Below is a detailed explanation of how to use the Bot class, along with a specific example.
 
 ### Overview of Bot Class
-The Bot class typically encapsulates common functionalities and properties that are essential for different types of robots. It serves as a superclass from which specific robot classes can inherit.
+The Bot class typically encapsulates common functionalities and properties that are essential for different types of robots. 
+It serves as a superclass from which specific robot classes can inherit.
 
 
 ### Using the Bot Class
-To utilize the Bot class, one needs to inherit from it while creating a new robot class. This approach allows the new class to leverage the pre-defined functionalities of the Bot class, while also adding specific functionalities unique to the new robot.
+To utilize the Bot class, one needs to inherit from it while creating a new robot class. 
+This approach allows the new class to leverage the pre-defined functionalities of the Bot class, while also adding specific functionalities 
+unique to the new robot.
 
 
 ```python
@@ -71,9 +74,8 @@ The Robot class is designed to establish a connection with the robot manager con
 These arguments can be received automatically from the robot manager console during a typical operation. Alternatively, 
 for debugging or development purposes, they can be set manually in the debug.json file.
 
-
-### Class Attributes and Methods:
-#### 1. self.parameters: 
+### Bot Attributes and Methods:
+#### 1. Robot Parameters: 
 This attribute is a dictionary containing parameters sent from the orchestrator. When a bot is executed, 
 it can receive various parameters from the robot console to be consumed during its operation. These parameters can include:
 
@@ -85,8 +87,8 @@ These parameters allow for dynamic and flexible bot operation, tailored to the s
 
 #### Handling Robot Parameters
 File Parameters in Base64 Format: When files are sent from the robot console, they are encoded in Base64 format. 
-This encoding ensures that file data is transmitted over networks in a text format, w
-hich is compatible with various system environments and network protocols.
+This encoding ensures that file data is transmitted over networks in a text format, 
+which is compatible with various system environments and network protocols.
 
 #### Conversion of Base64 Strings to Files: 
 The Bot class includes a specialized function, **save_file_from_console(string, folder=None)**, 
@@ -117,6 +119,7 @@ It's crucial to choose descriptive and relevant field names to ensure clarity an
 #### Parameter Retrieval in Robot: 
 Once the form is configured and the robot is running, it will access the inputted parameters using these custom field names. 
 The robot's code is designed to look for these specific field names to fetch and use the data accordingly.
+
 ##### Code Example
 ```python
 from robot_manager.base import Bot
@@ -136,9 +139,10 @@ This ensures that any initialization in the Bot class is also applied to Robot.
 Methods start, process, and end are defined as custom behaviors of the Robot class.
 
 
-#### 2. self.log
+#### 2. Logs
 This attribute is an instance of the Log class, which is used to send logs to the console. 
 The Log class plays a crucial role in monitoring and debugging the bot's activities by providing different levels of logging.
+
 #### Log page Example: 
 <p align="center">
   <img src='./img/Logs.png' width=100%>
@@ -203,7 +207,6 @@ The robot console provides two methods to facilitate the retrieval of assets, en
 **Parameters**: asset_id (str): The unique identifier of the asset.
 **Returns**: An instance of the Asset object.
 
-
 #### Asset Object
 Once an asset is retrieved using either of the above methods, it is represented as an Asset object with the following attributes:
 
@@ -232,6 +235,7 @@ Here's a detailed explanation of these methods, including example code to demons
 #### find_queue_by_id(queue_id: str)
 Searches for and retrieves a queue using its unique identifier. **Returns:** Queue Object representing the queue with the specified ID.
 **Parameters:** queue_id (str): The unique identifier of the queue.
+
 ##### Code Example:
 ```python
 from robot_manager.base import Bot
@@ -347,25 +351,35 @@ which are the individual units of work or tasks processed by the automated syste
 
 
 #### Item Object Attributes
-1. start_date (str): The start date for retrieving items.
-2. end_date (str): The end date for retrieving items.
-3. item_id (int): A unique identifier for the item.
-4. item_data (dict): Data associated with the item.
-5. item_executions (int): The number of times the item has been executed.
-6. value (str): The value of the item.
-7. status (str): The current status of the item (e.g., working, failed, pending).
+1. **start_date**: The start date for retrieving items.
+2. **end_date**: The end date for retrieving items.
+3. **item_id**: A unique identifier for the item.
+4. **item_data**: Data associated with the item.
+5. **item_executions**: The number of times the item has been executed.
+6. **value**: The value of the item.
+7. **status**: The current status of the item (e.g., working, failed, pending).
 
 #### Item Object Methods
-#### set_item_as_working():
-Marks the item as currently being processed.
-#### set_item_as_ok():
-Marks the item as successfully processed.
-#### set_item_as_fail():
-Marks the item as failed in processing.
-#### set_item_as_pending():
-Resets the item status to pending, indicating it is not yet processed.
-#### set_item_executions():
-Increments the execution counter for the item, tracking how many times it has been processed.
+1. **set_item_as_working()**: Marks the item as currently being processed. 
+2. **set_item_as_ok()**: Marks the item as successfully processed.
+3. **set_item_as_fail()**: Marks the item as failed in processing. 
+4. **set_item_as_pending()**: Resets the item status to pending, indicating it is not yet processed. 
+5. **set_item_executions()**: Increments the execution counter for the item, tracking how many times it has been processed.
+
+```python
+from robot_manager.base import Bot
+from robot_manager.queues import Queue
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        queue_id = "12345"
+        queue = self.find_queue_by_id(queue_id)
+        
+        item = queue.get_next_item()
+        item.set_item_as_working()
+        # TODO: Process The item
+        item.set_item_as_ok()
+```
 
 ### Design your flow using the @RobotFlow Decorator
 To optimize the functionality and maintainability of robots in the Robot Framework, it is highly recommended to use the @RobotFlow decorator. 
