@@ -38,6 +38,7 @@ The Bot class is a fundamental part of the Robot Framework, designed to serve as
 ### Overview of Bot Class
 The Bot class typically encapsulates common functionalities and properties that are essential for different types of robots. It serves as a superclass from which specific robot classes can inherit.
 
+
 ### Using the Bot Class
 To utilize the Bot class, one needs to inherit from it while creating a new robot class. This approach allows the new class to leverage the pre-defined functionalities of the Bot class, while also adding specific functionalities unique to the new robot.
 
@@ -58,6 +59,96 @@ class Robot(Bot):
     def end(self):
         print("I'm the last method")
 ```
+
+### Class Attributes
+#### self.parameters: 
+This attribute is a dictionary containing parameters sent from the orchestrator. When a bot is executed, 
+it can receive various parameters from the robot console to be consumed during its operation. These parameters can include:
+
+1. Strings: Textual data.
+2. Booleans: True/False values. 
+3. Dates: Date values. 
+4. Files: File objects or paths. 
+These parameters allow for dynamic and flexible bot operation, tailored to the specific needs of each task.
+
+##### Handling File Parameters
+File Parameters in Base64 Format: When files are sent from the robot console, they are encoded in Base64 format. 
+This encoding ensures that file data is transmitted over networks in a text format, w
+hich is compatible with various system environments and network protocols.
+
+##### Conversion of Base64 Strings to Files: 
+The Bot class includes a specialized function, **save_file_from_console(string, folder=None)**, 
+which efficiently handles the conversion of Base64 strings back into files. 
+This function is crucial for processing file inputs received from the robot console.
+###### Function Parameters:
+**string**: The Base64 encoded string representing the file's content.
+**folder (optional)**: The destination folder where the file will be saved. If not specified, a default location is used.
+**Return Value**: This function returns the full path to the saved file, allowing the bot to access and utilize the file in its operations.
+
+##### Code Example
+```python
+from robot_manager.base import Bot
+
+class Robot(Bot):
+     def __init__(self, **kwargs):
+        super().__init__(**kwargs, disabled=False)
+        self.file = self.parameters.get('file')
+        self.filepath = self.save_file_from_console(self.file)
+````
+
+#### How to configure Parameters in Robot console 
+
+##### Creating a New Form: 
+During the robot setup, you need to create a new form in the robot console. 
+This form serves as the interface for inputting the parameters that the robot will receive and utilize during its operations.
+
+##### Defining Custom Field Names: 
+In this form, each parameter requires a unique custom field name. 
+These field names are not just identifiers but also serve as keys for the robot to retrieve and process the corresponding data. 
+It's crucial to choose descriptive and relevant field names to ensure clarity and ease of use.
+
+##### Parameter Retrieval in Robot: 
+Once the form is configured and the robot is running, it will access the inputted parameters using these custom field names. 
+The robot's code is designed to look for these specific field names to fetch and use the data accordingly.
+
+#### Example Form
+<p align="center">
+  <img src='./img/form.png' width=100%>
+</p>
+
+
+#### Send Logs to Robot Console: 
+This attribute is an instance of the Log class, which is used to send logs to the console. 
+The Log class plays a crucial role in monitoring and debugging the bot's activities by providing different levels of logging.
+##### Log Class
+The Log class is an integral part of the Bot superclass, enabling efficient logging of the bot's activities and exceptions.
+##### debug(log: str): 
+This method sends a debug log to the robot manager console. It is used for detailed diagnostic information, 
+typically of interest only when diagnosing problems. 
+##### trace(log: str): 
+This method sends a trace log, which is used for general tracing of the application flow.
+##### log(log: str): 
+This method sends an info log to the console. It is used for general informational messages that highlight the progress of the 
+application at coarse-grained level.
+##### system_exception(error: str): 
+This method is used to log system-level exceptions, indicating issues in the system's functioning, 
+such as connectivity or hardware failures.
+##### business_exception(error: str): 
+This method logs business-level exceptions, which are related to the logic and rules of the business process being 
+automated.
+
+#### Exception Handling in Log Class
+The Log class has robust exception handling, particularly in the send method. 
+If there is an issue with the connection to the orchestrator, it raises an OrchestratorConnectionError, ensuring that any connectivity problems are promptly 
+identified and can be addressed.
+
+<p align="center">
+  <img src='./img/Logs.png' width=100%>
+</p>
+
+
+
+
 ### Explanation
 In the provided example:
 
