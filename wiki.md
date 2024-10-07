@@ -598,19 +598,19 @@ class Robot(Bot):
     def __init__(self, **kwargs):
         super().__init__(**kwargs, disabled=False)
 
-    @RobotFlow(node=Nodes.StartNode)
+    @RobotFlow(node=Nodes.StartNode, children="get_transaction_data")
     def init(self, *args):
         # Transaction data example
         self.data = [1, 2, 3, 4, 5]
         self.log.trace("start")
 
-    @RobotFlow(node=Nodes.ConditionNode, parents=["init", "process_transaction"],condition=lambda data: True if len(data) > 0 else False)
+    @RobotFlow(node=Nodes.ConditionNode, children={True:"init", False:"process_transaction"},condition=lambda data: True if len(data) > 0 else False)
     def get_transaction_data(self, *args):
         # Simulation of data fetching process
         self.log.trace("get_transaction_data")
         return self.data
 
-    @RobotFlow(node=Nodes.OnTrue, parents=["get_transaction_data"])
+    @RobotFlow(node=Nodes.OperationNode, children="get_transaction_data")
     def process_transaction(self, *args):
         # Get first available item of array
         item = args[0][0]
@@ -621,11 +621,11 @@ class Robot(Bot):
         self.data.pop(0)
         self.log.trace(f"process_transaction_data for element {item}")
 
-    @RobotFlow(node=Nodes.OnFalse, parents=["get_transaction_data"])
+    @RobotFlow(node=Nodes.OperationNode, children="end")
     def finish_process(self, *args):
         self.log.trace(f"finish_process")
 
-    @RobotFlow(node=Nodes.EndNode, parents=["finish_process"])
+    @RobotFlow(node=Nodes.EndNode)
     def end(self, *args):
         print("end")
 ````
@@ -655,7 +655,7 @@ To gain a clearer insight into the functioning of the conditional node, let's de
 in the aforementioned example:
 
 ````python
-@RobotFlow(node=Nodes.ConditionNode, parents=["init","process_transaction"], condition=lambda data: True if len(data) > 0 else False)
+@RobotFlow(node=Nodes.ConditionNode, children=["init","process_transaction"], condition=lambda data: True if len(data) > 0 else False)
 ````
 
 In the outlined code, the get_transaction_data method functions as a crucial conditional node within the workflow. 
@@ -664,17 +664,6 @@ This setup allows the method to be invoked either after the **init method** or f
 
 ### Structure of the Conditional Node
 
-#### Child Nodes:
-The get_transaction_data node is designed to branch into two distinct paths, determined by its child nodes OnTrue and OnFalse.
-These paths are defined as follows:
-```python
-@RobotFlow(node=Nodes.OnTrue, parents=["get_transaction_data"]) 
-```
-For scenarios where the condition evaluates to True.
-```python  
-@RobotFlow(node=Nodes.OnFalse, parents=["get_transaction_data"])
-```
-For scenarios where the condition evaluates to False.
 
 ### Condition Function:
 The direction of the workflow after get_transaction_data is determined by the specified condition function: **lambda data: True if len(data) > 0 else False**
